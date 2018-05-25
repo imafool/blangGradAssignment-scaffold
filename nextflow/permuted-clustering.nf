@@ -50,7 +50,7 @@ process generateData {
     
   """
   set -e
-  java -cp `cat classpath` -Xmx2g matchings.PermutedClustering \
+  java -cp `cat classpath` -Xmx8g matchings.PermutedClustering \
     --experimentConfigs.managedExecutionFolder false \
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
@@ -112,7 +112,7 @@ process runInference {
   """
   set -e
   tail -n +2 generated/observations.csv | awk -F "," '{print \$2, ",", \$3, ",", \$4}' | sed 's/ //g' > data.csv
-  java -cp `cat classpath` -Xmx2g matchings.PermutedClustering \
+  java -cp `cat classpath` -Xmx8g matchings.PermutedClustering \
     --initRandom 123 \
     --experimentConfigs.managedExecutionFolder false \
     --experimentConfigs.saveStandardStreams false \

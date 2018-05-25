@@ -9,7 +9,7 @@ import java.util.ArrayList
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial
 
 class TestPermutation {
-  val static int size = 3
+  val static int size = 5
   val static UniformPermutation unifPermutationModel = new UniformPermutation.Builder().setPermutation(new Permutation(size)).build
   val static DiscreteMCTest test = 
     new DiscreteMCTest(

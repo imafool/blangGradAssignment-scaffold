@@ -6,7 +6,7 @@ import org.junit.Test
 import java.util.ArrayList
 
 class TestBipartiteMatching {
-  val static int size = 3
+  val static int size = 5
   val static UniformBipartiteMatching unifMatchingModel = new UniformBipartiteMatching.Builder().setMatching(new BipartiteMatching(size)).build
   val static DiscreteMCTest test = 
     new DiscreteMCTest(
