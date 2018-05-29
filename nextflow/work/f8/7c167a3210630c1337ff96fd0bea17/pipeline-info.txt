@@ -1,0 +1,4 @@
+scriptName: permuted-clustering.nf
+start: Mon May 28 15:45:38 PDT 2018
+runName: distraught_curran
+nextflow.version: 0.29.1
