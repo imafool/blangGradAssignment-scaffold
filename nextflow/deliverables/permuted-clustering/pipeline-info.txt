@@ -1,4 +1,4 @@
 scriptName: permuted-clustering.nf
-start: Wed May 30 13:40:04 PDT 2018
-runName: wise_picasso
+start: Wed May 30 13:52:48 PDT 2018
+runName: stupefied_liskov
 nextflow.version: 0.29.1
