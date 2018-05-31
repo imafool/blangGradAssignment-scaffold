@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import bayonet.distributions.Random;
+import bayonet.math.SpecialFunctions;
 import blang.core.LogScaleFactor;
 import blang.distributions.Generators;
 import blang.mcmc.ConnectedFactor;
@@ -47,7 +48,6 @@ public class PermutationSampler implements Sampler {
 	
     // Do we accept the proposal?
     boolean decision = rand.nextBernoulli(acceptanceRate);
-    
     // if we do NOT accept, then swap again to get back to current.
     // We swap instead of saving an instance because it will be resource heavy to save many instances
     if (!decision) {
