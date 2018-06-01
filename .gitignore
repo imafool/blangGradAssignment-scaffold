@@ -19,3 +19,5 @@ nextflow/.nextflow
 nextflow/work
 results
 create-scaffold.bash
+ess.R
+permutations.csv
