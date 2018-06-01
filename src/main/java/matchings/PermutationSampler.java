@@ -33,27 +33,28 @@ public class PermutationSampler implements Sampler {
   @Override
   public void execute(Random rand) {
     // Find current density
-	double currentLogDensity = logDensity();
-	
+    double currentLogDensity = logDensity();
+
     // swap two vertices as a proposed step, then find proposed log density
-	UnorderedPair<Integer, Integer> pair = Generators.distinctPair(rand, permutation.componentSize());
+    UnorderedPair<Integer, Integer> pair = Generators.distinctPair(rand, permutation.componentSize());
     Collections.swap(permutation.getConnections(), pair.getFirst(), pair.getSecond());
     double proposedLogDensity = logDensity();
-    
+
     // Find acceptance rate/probability
     // min of (1, P(a_{i+1}) / P(a_i)) = min of (1, proposed/current)
     // NOTE: By e^proLogDen / e^currLogDen defeats the purpose of logDensities.
-    // 		 Will be interpreted as 0/0 (or at least less efficient in computation).
-    double acceptanceRate = Math.min(1, Math.exp(proposedLogDensity - currentLogDensity)); 
-	
+    // Will be interpreted as 0/0 (or at least less efficient in computation).
+    double acceptanceRate = Math.min(1, Math.exp(proposedLogDensity - currentLogDensity));
+
     // Do we accept the proposal?
     boolean decision = rand.nextBernoulli(acceptanceRate);
     // if we do NOT accept, then swap again to get back to current.
-    // We swap instead of saving an instance because it will be resource heavy to save many instances
+    // We swap instead of saving an instance because it will be resource heavy to
+    // save many instances
     if (!decision) {
-       Collections.swap(permutation.getConnections(), pair.getFirst(), pair.getSecond());
+      Collections.swap(permutation.getConnections(), pair.getFirst(), pair.getSecond());
     }
-    
+
   }
   
   
