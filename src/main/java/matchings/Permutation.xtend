@@ -5,6 +5,8 @@ import blang.mcmc.Samplers
 import java.util.Random
 import static java.util.Collections.sort
 import static java.util.Collections.shuffle
+import blang.inits.DesignatedConstructor
+import blang.inits.ConstructorArg
 
 /**
  * A permutation or equivalently, a bipartite perfect 
@@ -22,6 +24,12 @@ import static java.util.Collections.shuffle
   /**
    * Sample an independent uniform permutation in place.
    */
+   
+  @DesignatedConstructor
+  new (@ConstructorArg("component size") int componentSize) {
+    super(componentSize)
+  } 
+  
   def void sampleUniform(Random random) { 
     sort(connections) // sort first to make independent from the current config. 
     shuffle(connections, random)
