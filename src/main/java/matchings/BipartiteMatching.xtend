@@ -13,6 +13,8 @@ import bayonet.distributions.Multinomial
 import blang.mcmc.Samplers
 import java.util.Set
 import java.util.ArrayList
+import blang.inits.DesignatedConstructor
+import blang.inits.ConstructorArg
 
 /**
  * We use the same representation as Permutation.xtend, but now 
@@ -25,7 +27,8 @@ import java.util.ArrayList
   
   val public static int FREE = -1
   
-  new (int componentSize) {
+  @DesignatedConstructor
+  new (@ConstructorArg("component size") int componentSize) {
     super(componentSize)
     sizeProbabilities = normalizations(componentSize)
     logNormalization = Multinomial.expNormalize(sizeProbabilities)

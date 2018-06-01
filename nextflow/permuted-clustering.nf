@@ -134,13 +134,48 @@ process calculateESS{
     file samples
   """
   #!/usr/bin/env Rscript
+
+# Import csv
+  permData <- read.csv("samples/permutations.csv")
+  testResult <- matrix(0,dim(permData)[1],5)
+  for (i in 1:as.integer(dim(permData)[1]/5)){
+    for (j in 1:5){
+      if (j == 1 && as.integer(permData[(i-1)*5+j, 'value']) == 2){
+        testResult[i] = 1
+      }
+    }
+  }
+  
+  # Calculations for sigma^2
+  N <- length(testResult)
+  sampleMean <- sum(testResult)/N
+  sampleVar <- sum((testResult-sampleMean)^2) / (N-1)
+  
+  # Calculations for Var(mu)
+  binSize <- floor(sqrt(N))
+  nBins <- floor(sqrt(N))
+  i <- 1
+  binMean <- array()
+  while (i <= nBins){
+    binSum <- sum(testResult[(1+(i-1)*binSize):(i*binSize)])
+    binMean[i] <- binSum/binSize
+    i <- i + 1
+  }
+  meanMean <- sum(binMean)/nBins
+  varMean <- sum((binMean - meanMean)^2) / (binSize - 1)
+  
+  # ESS
+  ess <- binSize * sampleVar / varMean
+
+
   wd <- getwd()
   outputDir <- dirname(dirname(dirname(getwd())))
   trace <- read.table(paste(wd,'/../../../trace.txt', sep = ""), sep = '\t', header = TRUE)
   options(digits = 4)
   timeToRunInf <- as.double(substr(trace[5,8], 0, 4))
-  #timeToRunInf <- file(paste(wd,"/ESS.txt",sep = ""))
-  write(timeToRunInf, file=paste(outputDir,"/ESS.txt", sep = ""))
+  essps <- ess/timeToRunInf
+  compEfficiency <- c(ess, timeToRunInf, essps)
+  write(compEfficiency, file=paste(outputDir,"/ESS.txt", sep = ""))
   """
 }
 

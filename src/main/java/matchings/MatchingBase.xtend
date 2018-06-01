@@ -4,6 +4,8 @@ import org.eclipse.xtend.lib.annotations.Data
 import blang.inits.experiments.tabwriters.TidilySerializable
 import blang.inits.experiments.tabwriters.TidySerializer.Context
 import java.util.List
+import blang.inits.DesignatedConstructor
+import blang.inits.ConstructorArg
 
 /**
  * Shared functionality and representation used by Permutation and 
@@ -22,7 +24,8 @@ import java.util.List
   /**
    * Initialize to the identity permutation.
    */
-  new (int componentSize) {
+  @DesignatedConstructor
+  new (@ConstructorArg("component size") int componentSize) {
     connections = (0 ..< componentSize).toList
   }
   

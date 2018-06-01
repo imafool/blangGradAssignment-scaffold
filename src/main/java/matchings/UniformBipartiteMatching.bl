@@ -3,7 +3,7 @@ package matchings
 import matchings.BipartiteMatching
 
 model UniformBipartiteMatching {
-  random BipartiteMatching matching 
+  random BipartiteMatching matching ?: new BipartiteMatching(10) 
   
   laws {
     logf(matching) {
