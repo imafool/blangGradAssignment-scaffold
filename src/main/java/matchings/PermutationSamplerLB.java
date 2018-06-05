@@ -36,7 +36,8 @@ public class PermutationSamplerLB implements Sampler {
   public void execute(Random rand) {
     List<PermutationStateProbability> candidates = getNeighbours();
     PermutationStateProbability proposedState = getProposedState(candidates, rand);
-    double alpha = calculateAlpha(proposedState);
+    int candidateIndex = candidates.indexOf(proposedState);
+    double alpha = calculateAlpha(candidateIndex, proposedState);
     decide(proposedState, alpha, rand);
   }
    
@@ -62,21 +63,18 @@ public class PermutationSamplerLB implements Sampler {
     List<PermutationStateProbability> neighbours = new ArrayList<PermutationStateProbability>();
     // initialize the logProbability's normalization factor with 0 (e^NEG_INF)
     double sumPiY = Double.NEGATIVE_INFINITY;
-    double sumPiX = Double.NEGATIVE_INFINITY;
     int size = permutation.componentSize();
     for (int indexOne = 0; indexOne < size; indexOne++) {
       for (int indexTwo = indexOne + 1; indexTwo < size; indexTwo++) {
         PermutationStateProbability state = new PermutationStateProbability(indexOne, indexTwo);
         calculateQ(state);
         sumPiY = NumericalUtils.logAdd(sumPiY, state.qXY);
-        sumPiX = NumericalUtils.logAdd(sumPiX, state.qYX);
         neighbours.add(state);
       }
     }
     // Normalize 
     for (PermutationStateProbability state : neighbours) {
       state.qXY -= sumPiY;
-      state.qYX -= sumPiX;
     }
     
     return neighbours;
@@ -96,7 +94,7 @@ public class PermutationSamplerLB implements Sampler {
   /**
    * @return piY without affecting permutation.getConnections()
    */
-  private double getPiY(PermutationStateProbability psb) {
+  private double getPiNext(PermutationStateProbability psb) {
     move(psb);
     double piY = logDensity();
     move(psb);
@@ -108,11 +106,12 @@ public class PermutationSamplerLB implements Sampler {
   /**
    * @param qYX and qXY are Q_root
    */
-  private double calculateAlpha(PermutationStateProbability proposedState) {
+  private double calculateAlpha(int candidateIndex, PermutationStateProbability proposedState) {
     double piX = logDensity();
-    double piY = getPiY(proposedState);
-    double qYX = proposedState.qYX;
+    double piY = getPiNext(proposedState);
     double qXY = proposedState.qXY;
+    List<PermutationStateProbability> candidates = getNeighbours();
+    double qYX = candidates.get(candidateIndex).qXY;
     return Math.min(1.0, Math.exp(piY - piX + qYX - qXY));
   }
 
@@ -120,11 +119,10 @@ public class PermutationSamplerLB implements Sampler {
 
   /**
    * @param state is modified to hold non-normalized Q_root values
-   * namely qXY and qYX
+   * namely qXY
    */
   private void calculateQ(PermutationStateProbability state) {
-    state.qXY = 0.5 * getPiY(state);
-    state.qYX = 0.5 * logDensity();
+    state.qXY = 0.5 * getPiNext(state);
     return;
   }
 
