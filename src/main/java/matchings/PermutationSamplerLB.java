@@ -107,7 +107,7 @@ public class PermutationSamplerLB implements Sampler {
 
 
   /**
-   * This calculates the Q_root
+   * This calculates the Q_root, not normalized
    */
   private void calculateQ(PermutationStateProbability state) {
     state.qXY = 0.5 * getPiY(state);
