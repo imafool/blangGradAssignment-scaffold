@@ -175,7 +175,7 @@ process calculateESS{
   timeToRunInf <- as.double(substr(trace[5,8], 0, 4))
   essps <- ess/timeToRunInf
   compEfficiency <- c(ess, timeToRunInf, essps)
-  write(compEfficiency, file=paste(outputDir,"/ESS.txt", sep = ""))
+  write(compEfficiency, file=paste(outputDir,"/deliverables/permuted-clustering/ESS.txt", sep = ""))
   """
 }
 
