@@ -44,11 +44,11 @@ public class PermutationSamplerLB implements Sampler {
    */
   private PermutationStateProbability getProposedState(Random rand) {
     List<PermutationStateProbability> candidates = getNeighbours();
-    double qYX[] = new double[candidates.size()];
-    for (int i = 0 ; i < qYX.length ; i++) {
-      qYX[i] = Math.exp(candidates.get(i).qYX);
+    double qXY[] = new double[candidates.size()];
+    for (int i = 0 ; i < qXY.length ; i++) {
+      qXY[i] = Math.exp(candidates.get(i).qXY);
     }
-    int candidateIndex = rand.nextCategorical(qYX);
+    int candidateIndex = rand.nextCategorical(qXY);
     PermutationStateProbability proposal = candidates.get(candidateIndex);
 
     return proposal;
