@@ -44,7 +44,7 @@ public class PermutationSamplerLB implements Sampler {
    * From list of neighbouring states, pick one categorically. 
    */
   private PermutationStateProbability getProposedState(List<PermutationStateProbability> candidates, Random rand) {
-    double qXY[] = new double[candidates.size()];
+    double[] qXY = new double[candidates.size()];
     for (int i = 0 ; i < qXY.length ; i++) {
       qXY[i] = Math.exp(candidates.get(i).qXY);
     }
