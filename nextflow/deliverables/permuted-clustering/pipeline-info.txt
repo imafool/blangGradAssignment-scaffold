@@ -1,4 +1,0 @@
-scriptName: permuted-clustering.nf
-start: Thu May 31 15:14:53 PDT 2018
-runName: fabulous_crick
-nextflow.version: 0.29.1
