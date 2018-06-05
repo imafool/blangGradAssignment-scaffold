@@ -73,7 +73,7 @@ public class PermutationSamplerLB implements Sampler {
         neighbours.add(state);
       }
     }
-    // Normalize
+    // Normalize 
     for (PermutationStateProbability state : neighbours) {
       state.qXY -= sumPiY;
       state.qYX -= sumPiX;
