@@ -40,7 +40,7 @@ public class PermutationSamplerLB implements Sampler {
   }
    
   /**
-   * From a list of neighbouring states, pick one categorically. 
+   * From list of neighbouring states, pick one categorically. 
    */
   private PermutationStateProbability getProposedState(Random rand) {
     List<PermutationStateProbability> candidates = getNeighbours();
