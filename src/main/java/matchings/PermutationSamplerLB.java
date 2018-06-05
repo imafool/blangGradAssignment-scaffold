@@ -61,22 +61,22 @@ public class PermutationSamplerLB implements Sampler {
   private List<PermutationStateProbability> getNeighbours() {
     List<PermutationStateProbability> neighbours = new ArrayList<PermutationStateProbability>();
     // initialize the logProbability's normalization factor with 0 (e^NEG_INF)
-    double normX = Double.NEGATIVE_INFINITY;
-    double normY = Double.NEGATIVE_INFINITY;
+    double sumPiY = Double.NEGATIVE_INFINITY;
+    double sumPiX = Double.NEGATIVE_INFINITY;
     int size = permutation.componentSize();
     for (int indexOne = 0; indexOne < size; indexOne++) {
       for (int indexTwo = indexOne + 1; indexTwo < size; indexTwo++) {
         PermutationStateProbability state = new PermutationStateProbability(indexOne, indexTwo);
         calculateQ(state);
-        normX = NumericalUtils.logAdd(normX, state.qXY);
-        normY = NumericalUtils.logAdd(normY, state.qYX);
+        sumPiY = NumericalUtils.logAdd(sumPiY, state.qXY);
+        sumPiX = NumericalUtils.logAdd(sumPiX, state.qYX);
         neighbours.add(state);
       }
     }
     // Normalize
     for (PermutationStateProbability state : neighbours) {
-      state.qXY -= normY;
-      state.qYX -= normX;
+      state.qXY -= sumPiY;
+      state.qYX -= sumPiX;
     }
     
     return neighbours;
