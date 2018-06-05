@@ -34,7 +34,8 @@ public class PermutationSamplerLB implements Sampler {
 
   @Override
   public void execute(Random rand) {
-    PermutationStateProbability proposedState = getProposedState(rand);
+    List<PermutationStateProbability> candidates = getNeighbours();
+    PermutationStateProbability proposedState = getProposedState(candidates, rand);
     double alpha = calculateAlpha(proposedState);
     decide(proposedState, alpha, rand);
   }
@@ -42,8 +43,7 @@ public class PermutationSamplerLB implements Sampler {
   /**
    * From list of neighbouring states, pick one categorically. 
    */
-  private PermutationStateProbability getProposedState(Random rand) {
-    List<PermutationStateProbability> candidates = getNeighbours();
+  private PermutationStateProbability getProposedState(List<PermutationStateProbability> candidates, Random rand) {
     double qXY[] = new double[candidates.size()];
     for (int i = 0 ; i < qXY.length ; i++) {
       qXY[i] = Math.exp(candidates.get(i).qXY);
@@ -60,7 +60,7 @@ public class PermutationSamplerLB implements Sampler {
    */
   private List<PermutationStateProbability> getNeighbours() {
     List<PermutationStateProbability> neighbours = new ArrayList<PermutationStateProbability>();
-    // initialize with e^neg_inf (0)
+    // initialize the logProbability's normalization factor with 0 (e^NEG_INF)
     double normX = Double.NEGATIVE_INFINITY;
     double normY = Double.NEGATIVE_INFINITY;
     int size = permutation.componentSize();
