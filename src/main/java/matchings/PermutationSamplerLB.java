@@ -39,8 +39,9 @@ public class PermutationSamplerLB implements Sampler {
     decide(proposedState, alpha, rand);
   }
    
-
-
+  /**
+   * From a list of neighbouring states, pick one categorically. 
+   */
   private PermutationStateProbability getProposedState(Random rand) {
     List<PermutationStateProbability> candidates = getNeighbours();
     double qXY[] = new double[candidates.size()];
@@ -53,7 +54,10 @@ public class PermutationSamplerLB implements Sampler {
     return proposal;
   }
 
-
+  /**
+   * Return a list of neighbouring states 
+   * holding their respective normalized qXY, qYX, and indices values
+   */
   private List<PermutationStateProbability> getNeighbours() {
     List<PermutationStateProbability> neighbours = new ArrayList<PermutationStateProbability>();
     // initialize with e^neg_inf (0)
@@ -78,12 +82,20 @@ public class PermutationSamplerLB implements Sampler {
     return neighbours;
   }
 
+  
+  /**
+   * @param psb 's indices dictate which state we will move to.
+   * permutation.getConnections() is modified accordingly
+   */
   private void move(PermutationStateProbability psb) {
     Collections.swap(permutation.getConnections(), psb.indexOne, psb.indexTwo);
   }
 
 
 
+  /**
+   * @return piY without affecting permutation.getConnections()
+   */
   private double getPiY(PermutationStateProbability psb) {
     move(psb);
     double piY = logDensity();
@@ -107,7 +119,8 @@ public class PermutationSamplerLB implements Sampler {
 
 
   /**
-   * This calculates the Q_root, not normalized
+   * @param state is modified to hold non-normalized Q_root values
+   * namely qXY and qYX
    */
   private void calculateQ(PermutationStateProbability state) {
     state.qXY = 0.5 * getPiY(state);
@@ -124,6 +137,9 @@ public class PermutationSamplerLB implements Sampler {
   }
 
 
+  /**
+   * Take a step or not, depending if alpha passes test.
+   */
   private void decide(PermutationStateProbability proposedState, double alpha, Random rand) {
     boolean accept = rand.nextBernoulli(alpha);
     if (accept) {
