@@ -1,0 +1,79 @@
+# --checkIsDAG <boolean> (default value: true)
+
+  --engine Forward    # <PosteriorInferenceEngine: SCM|PT|Forward|Exact|None|fully qualified> (default value: SCM)
+
+# --engine.nSamples <int> (default value: 1)
+
+# --engine.random <Random> (default value: 1)
+
+# --excludeFromOutput <List: Space separated items or "file <path>" to load from newline separated file> (optional)
+
+# --experimentConfigs.configFile <File> (optional)
+#   description: If set, use those arguments in provided file that do not appear in the provided arguments.
+
+  --experimentConfigs.managedExecutionFolder false 
+    # <boolean> (default value: true)
+#   description: Automatically organize results into subdirectories of 'results/all'?
+
+  --experimentConfigs.recordExecutionInfo false 
+    # <boolean> (default value: true)
+#   description: Record information such as timing, main class, code version, etc for this run?
+
+  --experimentConfigs.recordGitInfo false 
+    # <boolean> (default value: true)
+
+  --experimentConfigs.saveStandardStreams false 
+    # <boolean> (default value: true)
+#   description: Save combined standard out and err into a file?
+
+# --experimentConfigs.tabularWriter <TabularWriterFactory: CSV|Spark|fully qualified> (default value: CSV)
+
+# --initRandom <Random> (default value: 1)
+
+  --model matchings.PermutedClustering$Builder    # <ModelBuilder: fully qualified>
+
+# --model.groupSize <Integer> (optional)
+
+# --model.means <List: Space separated items or "file <path>" to load from newline separated file> (optional)
+
+# --model.nGroups <Integer> (optional)
+
+# --model.observations.file <File> (a parent is optional)
+#   description: CSV file where the first entry is the row index (starting at 0), the second is the col index (starting at 0), and the last is the value.
+# ! Did not instantiate <java.io.File> because of missing input
+
+# --model.observations.nCols <Integer> (optional)
+
+# --model.observations.nRows <Integer> (optional)
+
+# --model.observations.sparse <boolean> (a parent is optional)
+
+# --model.permutations <List: Space separated items or "file <path>" to load from newline separated file> (optional)
+
+# --model.variances <List: Space separated items or "file <path>" to load from newline separated file> (optional)
+
+# --printAccessibilityGraph <boolean> (default value: false)
+
+# --samplers.additional <SamplerSet: Fully qualified instances of blang.mcmc.Sampler>
+#   description: Samplers to be added.
+
+# --samplers.excluded <SamplerSet: Fully qualified instances of blang.mcmc.Sampler>
+#   description: Samplers to be excluded (only useful if useAnnotation = true).
+
+# --samplers.useAnnotation <boolean> (default value: true)
+#   description: If the arguments of the annotations @Samplers should be used to determine a starting set of sampler types.
+
+# --skipForwardSamplerConstruction <boolean> (default value: false)
+
+# --version <String> (optional)
+#   description: Version of the blang SDK to use (see https://github.com/UBC-Stat-ML/blangSDK/releases), of the form of a git tag x.y.z where x >= 2. If omitted, use the local SDK's 'master' version.
+
+### Errors:
+
+#   error <root>
+# ! Failed to build type <blang.runtime.Runner>, possibly a parsing error
+#     input: 
+#     cause: NoSuchMethodError: matchings.PermutedClustering.access$0()Ljava/lang/Integer;
+
+#   error @ Xmx8g
+# ! Unknown input
