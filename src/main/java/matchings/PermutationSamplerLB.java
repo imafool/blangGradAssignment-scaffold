@@ -110,12 +110,22 @@ public class PermutationSamplerLB implements Sampler {
     double piX = logDensity();
     double piY = getPiNext(proposedState);
     double qXY = proposedState.qXY;
-    List<PermutationStateProbability> candidates = getNeighbours();
-    double qYX = candidates.get(candidateIndex).qXY;
-    return Math.min(1.0, Math.exp(piY - piX + qYX - qXY));
+    double qYX = getQYX(proposedState, candidateIndex);
+   return Math.min(1.0, Math.exp(piY - piX + qYX - qXY));
   }
 
 
+
+  /**
+   * Calculates qYX by first moving to the next state, then revert changes made.
+   */
+  private double getQYX(PermutationStateProbability proposedState, int candidateIndex) {
+    move(proposedState);
+    List<PermutationStateProbability> candidates = getNeighbours();
+    double qYX = candidates.get(candidateIndex).qXY;
+    move(proposedState);
+     return qYX;
+  }
 
   /**
    * @param state is modified to hold non-normalized Q_root values
