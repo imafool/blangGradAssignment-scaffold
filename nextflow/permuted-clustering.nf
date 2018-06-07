@@ -128,65 +128,66 @@ process runInference {
   """   
 }
 
-process calcJavaESS{
-    cache 'deep'
-    input:
-      file samples
-    """
-    set -e
-    java -cp `cat classpath` -Xmx8g matchings.ESS 
-    """ 
 
-
-}
-process calculateESS{
-  cache 'deep'
+// Gary Zhu's version
+process calculateESS {
   input:
     file samples
+  publishDir deliverableDir, mode: 'copy', overwrite: true  
   """
-  #!/usr/bin/env Rscript
+  #!/usr/bin/Rscript
+  
+  
+  # use this line to run
+  # rm -rf work | rm trace.txt | nextflow run ./permuted-clustering.nf -with-trace
+    
+  nGroups = $nGroups
+  groupSize = $groupSize
+  from_vertex = 0
+  to_vertex = 0
+  
+  trace = read.table("../../../trace.txt",sep='\t',header=TRUE)
+  data <- read.csv("samples/permutations.csv")
 
-# Import csv
-  permData <- read.csv("samples/permutations.csv")
-  testResult <- matrix(0,dim(permData)[1],5)
-  for (i in 1:as.integer(dim(permData)[1]/5)){
-    for (j in 1:5){
-      if (j == 1 && as.integer(permData[(i-1)*5+j, 'value']) == 2){
-        testResult[i] = 1
+  dur = as.double(substr(trace[5,8],0,4))
+
+  x = rep(0,as.integer(dim(data)[1]/(groupSize*nGroups)))
+  k = 0
+  for (i in 1:as.integer(dim(data)[1]/(groupSize*nGroups))) {
+    for (j in 1:groupSize) {
+      if (j == from_vertex+1 & as.integer(data[k+j,'value']) == to_vertex) {
+        x[i] = 1
       }
     }
+    k = k + groupSize*nGroups
+  }
+
+  N = length(x)
+  v_up = sum((x-sum(x)/N)^2)/(N-1)
+
+  I = x[1:sqrt(N)]
+  batch_size = sqrt(N)
+
+  incr = floor(sqrt(N))
+  up_idx = floor(sqrt(N))
+  num_batch = N%/%incr
+  I = rep(0,num_batch)
+
+  i = 1
+  while (i<=num_batch) {
+    x_batch = x[(up_idx-incr+1):up_idx]
+    I[i] = mean(x_batch)
+    up_idx = up_idx + incr
+    i = i + 1
   }
   
-  # Calculations for sigma^2
-  N <- length(testResult)
-  sampleMean <- sum(testResult)/N
-  sampleVar <- sum((testResult-sampleMean)^2) / (N-1)
-  
-  # Calculations for Var(mu)
-  binSize <- floor(sqrt(N))
-  nBins <- floor(sqrt(N))
-  i <- 1
-  binMean <- array()
-  while (i <= nBins){
-    binSum <- sum(testResult[(1+(i-1)*binSize):(i*binSize)])
-    binMean[i] <- binSum/binSize
-    i <- i + 1
-  }
-  meanMean <- sum(binMean)/nBins
-  varMean <- sum((binMean - meanMean)^2) / (binSize - 1)
-  
-  # ESS
-  ess <- binSize * sampleVar / varMean
+  M = length(I)
+  v_down = sum((I-sum(I)/M)^2)/(M-1)
+  ess = v_up/v_down*sqrt(N)
+  ess_per_sec = ess/dur
 
+  write(paste("ess_per_sec =",ess/dur),file="../../../deliverables/permuted-clustering/ess_per_sec.txt")
 
-  wd <- getwd()
-  outputDir <- dirname(dirname(dirname(getwd())))
-  trace <- read.table(paste(wd,'/../../../trace.txt', sep = ""), sep = '\t', header = TRUE)
-  options(digits = 4)
-  timeToRunInf <- as.double(substr(trace[5,8], 0, 4))
-  essps <- ess/timeToRunInf
-  compEfficiency <- c(ess, timeToRunInf, essps)
-  write(compEfficiency, file=paste(outputDir,"/deliverables/permuted-clustering/ESS.txt", sep = ""))
   """
 }
 
