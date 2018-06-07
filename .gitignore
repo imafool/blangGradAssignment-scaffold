@@ -22,5 +22,5 @@ nextflow/deliverables
 results
 create-scaffold.bash
 ess.R
+ess.txt
 permutations.csv
-assertionDifference

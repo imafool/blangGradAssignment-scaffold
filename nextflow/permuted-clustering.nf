@@ -3,7 +3,7 @@
 deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
 nGroups = 20
-groupSize = 5
+groupSize = 3
 
 process build {
   cache false
@@ -128,6 +128,17 @@ process runInference {
   """   
 }
 
+process calcJavaESS{
+    cache 'deep'
+    input:
+      file samples
+    """
+    set -e
+    java -cp `cat classpath` -Xmx8g matchings.ESS 
+    """ 
+
+
+}
 process calculateESS{
   cache 'deep'
   input:
