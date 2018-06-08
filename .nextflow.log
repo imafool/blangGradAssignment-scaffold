@@ -1,0 +1,123 @@
+Jun-07 18:31:31.828 [main] DEBUG nextflow.cli.Launcher - $> /usr/local/bin/nextflow ./nextflow/permuted-clustering.nf
+Jun-07 18:31:31.912 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 0.29.1
+Jun-07 18:31:31.926 [main] INFO  nextflow.cli.CmdRun - Launching `./nextflow/permuted-clustering.nf` [ecstatic_poisson] - revision: 5065ebdee7
+Jun-07 18:31:31.994 [main] DEBUG nextflow.Session - Session uuid: 5b789ac4-d76d-44b3-ac9e-29cae7f82cbc
+Jun-07 18:31:31.994 [main] DEBUG nextflow.Session - Run name: ecstatic_poisson
+Jun-07 18:31:31.996 [main] DEBUG nextflow.Session - Executor pool size: 4
+Jun-07 18:31:32.005 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 0.29.1 build 4804
+  Modified: 10-05-2018 07:47 UTC (00:47 PDT)
+  System: Linux 4.15.0-22-generic
+  Runtime: Groovy 2.4.15 on OpenJDK 64-Bit Server VM 1.8.0_171-8u171-b11-0ubuntu0.18.04.1-b11
+  Encoding: UTF-8 (UTF-8)
+  Process: 3656@kct450 [127.0.1.1]
+  CPUs: 4 - Mem: 3.6 GB (380.1 MB) - Swap: 8 GB (7.6 GB)
+Jun-07 18:31:32.063 [main] DEBUG nextflow.Session - Work-dir: /home/kevin/Blang/blangGradAssignment-scaffold/work [ext2/ext3]
+Jun-07 18:31:32.064 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/kevin/Blang/blangGradAssignment-scaffold/nextflow/bin
+Jun-07 18:31:32.142 [main] DEBUG nextflow.Session - Session start invoked
+Jun-07 18:31:32.149 [main] DEBUG nextflow.processor.TaskDispatcher - Dispatcher > start
+Jun-07 18:31:32.149 [main] DEBUG nextflow.script.ScriptRunner - > Script parsing
+Jun-07 18:31:32.435 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Jun-07 18:31:32.499 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.499 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.506 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.509 [main] INFO  nextflow.executor.Executor - [warm up] executor > local
+Jun-07 18:31:32.512 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=4; memory=3.6 GB; capacity=4; pollInterval=100ms; dumpInterval=5m
+Jun-07 18:31:32.516 [main] DEBUG nextflow.processor.TaskDispatcher - Starting monitor: LocalPollingMonitor
+Jun-07 18:31:32.516 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Jun-07 18:31:32.518 [main] DEBUG nextflow.executor.Executor - Invoke register for executor: local
+Jun-07 18:31:32.582 [main] DEBUG nextflow.Session - >>> barrier register (process: build)
+Jun-07 18:31:32.588 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > build -- maxForks: 4
+Jun-07 18:31:32.814 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.814 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.814 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.816 [main] DEBUG nextflow.Session - >>> barrier register (process: generateData)
+Jun-07 18:31:32.816 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > generateData -- maxForks: 4
+Jun-07 18:31:32.832 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.832 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.832 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.833 [main] DEBUG nextflow.Session - >>> barrier register (process: plotData)
+Jun-07 18:31:32.834 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > plotData -- maxForks: 4
+Jun-07 18:31:32.836 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.836 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.836 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.837 [main] DEBUG nextflow.Session - >>> barrier register (process: runInference)
+Jun-07 18:31:32.837 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > runInference -- maxForks: 4
+Jun-07 18:31:32.841 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.841 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.841 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.844 [main] DEBUG nextflow.Session - >>> barrier register (process: calculateESS)
+Jun-07 18:31:32.845 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > calculateESS -- maxForks: 4
+Jun-07 18:31:32.848 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.848 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.848 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.849 [main] DEBUG nextflow.Session - >>> barrier register (process: plotPosterior)
+Jun-07 18:31:32.849 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > plotPosterior -- maxForks: 4
+Jun-07 18:31:32.852 [main] DEBUG nextflow.processor.ProcessFactory - << taskConfig executor: null
+Jun-07 18:31:32.852 [main] DEBUG nextflow.processor.ProcessFactory - >> processorType: 'local'
+Jun-07 18:31:32.852 [main] DEBUG nextflow.executor.Executor - Initializing executor: local
+Jun-07 18:31:32.853 [main] DEBUG nextflow.Session - >>> barrier register (process: summarizePipeline)
+Jun-07 18:31:32.853 [main] DEBUG nextflow.processor.TaskProcessor - Creating operator > summarizePipeline -- maxForks: 4
+Jun-07 18:31:32.854 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+Jun-07 18:31:32.854 [main] DEBUG nextflow.Session - Session await
+Jun-07 18:31:32.893 [Actor Thread 5] DEBUG nextflow.util.CacheHelper - [WARN] Unknown hashing type: class java.util.Date -- Thu Jun 07 18:31:32 PDT 2018
+Jun-07 18:31:32.895 [Actor Thread 5] DEBUG nextflow.util.CacheHelper - [WARN] Unknown hashing type: class nextflow.util.VersionNumber -- 0.29.1
+Jun-07 18:31:32.910 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Jun-07 18:31:32.917 [Task submitter] INFO  nextflow.Session - [c4/5fb8a9] Submitted process > build
+Jun-07 18:31:32.943 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Jun-07 18:31:32.946 [Task submitter] INFO  nextflow.Session - [d5/0b238a] Submitted process > summarizePipeline
+Jun-07 18:31:32.955 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: build; status: COMPLETED; exit: 127; error: -; workDir: /home/kevin/Blang/blangGradAssignment-scaffold/work/c4/5fb8a9caa27d817df965970ad60173]
+Jun-07 18:31:32.999 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'build'
+
+Caused by:
+  Process `build` terminated with an error exit status (127)
+
+Command executed:
+
+  set -e
+  current_dir=`pwd`
+  cd ../../../..
+  ./gradlew build
+  ./gradlew printClasspath | grep CLASSPATH-ENTRY | sort | sed 's/CLASSPATH[-]ENTRY //' > $current_dir/temp_classpath
+  for file in `ls build/libs/*jar`
+  do
+    echo `pwd`/$file >> $current_dir/temp_classpath
+  done
+  cd -
+  touch jars_hash
+  for jar_file in `cat temp_classpath`
+  do
+    shasum $jar_file >> jars_hash
+  done
+  cat temp_classpath | paste -sd ":" - > classpath
+
+Command exit status:
+  127
+
+Command output:
+  (empty)
+
+Command error:
+  .command.sh: line 5: ./gradlew: No such file or directory
+
+Work dir:
+  /home/kevin/Blang/blangGradAssignment-scaffold/work/c4/5fb8a9caa27d817df965970ad60173
+
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`
+Jun-07 18:31:33.004 [Actor Thread 2] DEBUG nextflow.Session - <<< barrier arrive (process: build)
+Jun-07 18:31:33.006 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Process `build` terminated with an error exit status (127)
+Jun-07 18:31:33.007 [Actor Thread 7] DEBUG nextflow.Session - <<< barrier arrive (process: generateData)
+Jun-07 18:31:33.008 [Actor Thread 6] DEBUG nextflow.Session - <<< barrier arrive (process: runInference)
+Jun-07 18:31:33.010 [Actor Thread 8] DEBUG nextflow.Session - <<< barrier arrive (process: plotPosterior)
+Jun-07 18:31:33.017 [Actor Thread 8] DEBUG nextflow.Session - <<< barrier arrive (process: plotData)
+Jun-07 18:31:33.021 [Actor Thread 9] DEBUG nextflow.Session - <<< barrier arrive (process: calculateESS)
+Jun-07 18:31:33.042 [main] DEBUG nextflow.Session - Session await > all process finished
+Jun-07 18:31:33.042 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local)
+Jun-07 18:31:33.042 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Jun-07 18:31:33.055 [main] WARN  n.processor.TaskPollingMonitor - Killing pending tasks (1)
+Jun-07 18:31:33.061 [main] DEBUG nextflow.executor.LocalTaskHandler - Unable to kill summarizePipeline -- command: kill -TERM 3737; exit: 1 
+ bash: line 0: kill: (3737) - No such process
+
+Jun-07 18:31:33.063 [main] DEBUG nextflow.trace.StatsObserver - Workflow completed > WorkflowStats[succeedCount=0; failedCount=2; ignoredCount=0; cachedCount=0; succeedDuration=0ms; failedDuration=2ms; cachedDuration=0ms]
+Jun-07 18:31:33.101 [main] DEBUG nextflow.CacheDB - Closing CacheDB done
+Jun-07 18:31:33.111 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
