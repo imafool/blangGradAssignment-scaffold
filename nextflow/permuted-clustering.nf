@@ -129,7 +129,7 @@ process runInference {
 }
 
 
-// Gary Zhu's version
+// Gary Zhu's version (rewritten)
 process calculateESS {
   input:
     file samples
@@ -140,7 +140,7 @@ process calculateESS {
   
   # use this line to run
   # rm -rf work | rm trace.txt | nextflow run ./permuted-clustering.nf -with-trace
-    
+  
   nGroups = $nGroups
   groupSize = $groupSize
   from_vertex = 0
@@ -189,6 +189,7 @@ process calculateESS {
   write(paste("ess_per_sec =",ess/dur),file="../../../deliverables/permuted-clustering/ess_per_sec.txt")
 
   """
+
 }
 
 process plotPosterior {
