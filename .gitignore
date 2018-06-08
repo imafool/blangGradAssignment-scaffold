@@ -2,11 +2,12 @@
 bin/
 .DS_Store
 .classpath
-.nextflow.log
+.nextflow*
 .RHistory
 .settings
 .project
 build
+executionInfo/
 nextflow/.nextflow.log
 nextflow/.nextflow.log.1
 nextflow/.nextflow.log.2
@@ -24,4 +25,3 @@ nextflow/deliverables
 results
 create-scaffold.bash
 permutations.csv
-
