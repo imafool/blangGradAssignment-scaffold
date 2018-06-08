@@ -1,4 +1,0 @@
-scriptName: permuted-clustering.nf
-start: Thu Jun 07 18:31:32 PDT 2018
-runName: ecstatic_poisson
-nextflow.version: 0.29.1

@@ -2,6 +2,8 @@
 bin/
 .DS_Store
 .classpath
+.nextflow.log
+.RHistory
 .settings
 .project
 build
@@ -21,6 +23,5 @@ nextflow/trace*
 nextflow/deliverables
 results
 create-scaffold.bash
-ess.R
-ess.txt
 permutations.csv
+
