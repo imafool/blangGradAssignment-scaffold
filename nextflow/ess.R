@@ -7,7 +7,7 @@
   to_vertex = 0
   
   trace = read.table("../../../trace.txt",sep='\t',header=TRUE)
-  data <- read.csv("samples/permutations.csv")
+  data <- read.csv("generated_${x}/permutations.csv")
 
   dur = as.double(substr(trace[5,8],0,4))
 
