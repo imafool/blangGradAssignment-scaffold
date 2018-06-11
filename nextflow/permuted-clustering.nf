@@ -1,3 +1,7 @@
+/*
+vim: syntax=groovy
+-*- mode: groovy;-*-
+*/
 #!/usr/bin/env nextflow
 
 deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
@@ -93,15 +97,13 @@ process runInference {
   """   
 }
 
-// Gary Zhu's (rewritten)
 process calculateESS {
+  cache 'deep'
   input:
-    each x from 1..numDataSets
-    file samples from samples.collect()
-  publishDir deliverableDir, mode: 'copy', overwrite: true  
-    """
-    #!/usr/bin/Rscript ../../../ess.R  $nGroups $groupSize
-    """
+    file sample from samples.collect()    
+  output:
+    file "
+
 }
 
 
