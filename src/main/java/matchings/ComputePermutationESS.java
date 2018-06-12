@@ -27,6 +27,12 @@ public class ComputePermutationESS extends Experiment
   @Arg 
   Optional<String> field = Optional.empty();
   
+  @Arg
+  int groupSize;
+  
+  @Arg
+  int nGroups;
+  
   @Arg @DefaultValue("1")
   int moment        = 1;
   
@@ -44,14 +50,13 @@ public class ComputePermutationESS extends Experiment
         testResult.add(FAIL_VALUE);
       }
     }
+    System.out.println(testResult.size());
     return testResult;
   }
   
-  public static ArrayList<ArrayList<Double>> parsePermutationCSV(File permutationFile) throws FileNotFoundException, IOException {
-    int PERM_SIZE = 3;
-    int PERM_PER_SAMPLE = 2;
-    int PERM_INDEX = 1;
-    int SPAN = PERM_SIZE * PERM_PER_SAMPLE;
+  public static ArrayList<ArrayList<Double>> parsePermutationCSV(File permutationFile, int groupSize, int nGroups) throws FileNotFoundException, IOException {
+    int kthPermInGroup = 1;
+    int span = groupSize * nGroups;
     
     CSVParser parser = CSVFormat.DEFAULT.parse(new FileReader(permutationFile));
     List<CSVRecord> records = parser.getRecords();
@@ -59,15 +64,16 @@ public class ComputePermutationESS extends Experiment
 
     ArrayList<Double> permutation = new ArrayList<Double>();
     
-    for (int i = 0; i < records.size() - SPAN; i += SPAN) {
-      permutation.clear();
-      for (int j = (PERM_INDEX - 1) * PERM_SIZE + 1; j <= PERM_INDEX * PERM_SIZE; j++) {
-        double edge = (double) Integer.parseInt(records.get(i+j).get(3));
-        permutation.add(edge);
+    for (int i = 1; i <= records.size()-1; i += span){
+      if (i % span == kthPermInGroup) {
+        permutation.clear();
+        for (int j = 0; j < groupSize; j++) {
+          permutation.add((double) Integer.parseInt(records.get(i+j).get(3)));
+        }
+      result.add(new ArrayList<Double>(permutation));
       }
-      ArrayList<Double> permInstance = new ArrayList<Double>(permutation);
-      result.add(permInstance);
     }
+    System.out.println(result);
     return result;
   }
   
@@ -76,7 +82,7 @@ public class ComputePermutationESS extends Experiment
   {
     ArrayList<Double> testResults = null;
     try {
-      testResults = testFunction(parsePermutationCSV(csvFile));
+      testResults = testFunction(parsePermutationCSV(csvFile, groupSize, nGroups));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
