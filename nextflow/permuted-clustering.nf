@@ -42,6 +42,7 @@ classpath.into {
 
 numDataSets=2
 
+
 process generateData {
   cache 'deep'
   input:
@@ -73,7 +74,7 @@ process runInference {
     file classpath2
     file jars_hash2
   output:
-    file "samples" into samples
+    file "samples_${x}" into samples
   """
   set -e
   tail -n +2 generated_${x}/observations.csv | awk -F "," '{print \$2, ",", \$3, ",", \$4}' | sed 's/ //g' > data.csv
@@ -90,6 +91,7 @@ process runInference {
     --engine.nScans 2_000 \
     --engine.nThreads MAX \
     --engine.nChains 8
+  mv samples samples_${x}
   """   
 }
 

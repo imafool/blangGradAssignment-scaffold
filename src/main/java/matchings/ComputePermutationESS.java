@@ -50,7 +50,7 @@ public class ComputePermutationESS extends Experiment
         testResult.add(FAIL_VALUE);
       }
     }
-    System.out.println(testResult.size());
+    System.out.println(testResult);
     return testResult;
   }
   
