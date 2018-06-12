@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,9 @@ public class ComputePermutationESS extends Experiment
   @Arg
   int nGroups;
   
+  @Arg
+  double infDuration;
+
   @Arg @DefaultValue("1")
   int moment        = 1;
   
@@ -50,7 +55,6 @@ public class ComputePermutationESS extends Experiment
         testResult.add(FAIL_VALUE);
       }
     }
-    System.out.println(testResult);
     return testResult;
   }
   
@@ -73,7 +77,6 @@ public class ComputePermutationESS extends Experiment
       result.add(new ArrayList<Double>(permutation));
       }
     }
-    System.out.println(result);
     return result;
   }
   
@@ -88,10 +91,20 @@ public class ComputePermutationESS extends Experiment
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+
     System.out.println(moment == 1 ?
        EffectiveSampleSize.ess(testResults) :
        EffectiveSampleSize.ess(testResults, x -> Math.pow(x, moment)));
+
+
+    try {
+      PrintWriter writer = new PrintWriter("essps"+"_"+String.valueOf(groupSize)+".txt", "UTF-8");
+      writer.write(String.valueOf(EffectiveSampleSize.ess(testResults)/(infDuration / 1000)));
+      writer.close();
+    } catch (FileNotFoundException | UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    
   }
 
   public static void main(String [] args) 

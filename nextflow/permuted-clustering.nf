@@ -34,14 +34,16 @@ process build {
 jars_hash.into {
   jars_hash1
   jars_hash2
+  jars_hash3
 }
 classpath.into {
   classpath1
   classpath2
+  classpath3
 }
 
 minGroupSize=3
-maxGroupSize=4
+maxGroupSize=5
 
 process generateData {
   cache 'deep'
@@ -75,6 +77,7 @@ process runInference {
     file jars_hash2
   output:
     file "samples_${x}" into samples
+    file "monitoring_${x}" into monitorings
   """
   set -e
   tail -n +2 generated_${x}/observations.csv | awk -F "," '{print \$2, ",", \$3, ",", \$4}' | sed 's/ //g' > data.csv
@@ -92,9 +95,28 @@ process runInference {
     --engine.nThreads MAX \
     --engine.nChains 8
   mv samples samples_${x}
+  mv monitoring monitoring_${x}
   """   
 }
 
+process calculateESS {
+  cache 'deep'
+  input:
+    each x from minGroupSize..maxGroupSize
+    file samples from samples.collect()
+    file monitoring from monitorings.collect()
+    file classpath3
+    file jars_hash3  
+  """
+  INF_DURATION=\$(tail -n +2 monitoring_${x}/runningTimeSummary.tsv | cut -c16-99 | tr -d '[:space:]')
+  set -e
+  java -cp `cat classpath` -Xmx8g matchings.ComputePermutationESS \
+    --nGroups $nGroups \
+    --groupSize ${x} \
+    --csvFile samples_${x}/permutations.csv \
+    --infDuration \$INF_DURATION 
+  """
+}
 
 
 process summarizePipeline {
