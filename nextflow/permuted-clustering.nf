@@ -40,13 +40,13 @@ classpath.into {
   classpath2
 }
 
-numDataSets=2
-
+minGroupSize=3
+maxGroupSize=4
 
 process generateData {
   cache 'deep'
   input:
-    each x from 1..numDataSets
+    each x from minGroupSize..maxGroupSize
     file classpath1
     file jars_hash1
   output:
@@ -60,7 +60,7 @@ process generateData {
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
     --model.nGroups $nGroups \
-    --model.groupSize $groupSize \
+    --model.groupSize ${x} \
     --engine Forward
   mv samples generated_${x}
   """
@@ -69,7 +69,7 @@ process generateData {
 process runInference {
   cache 'deep'
   input:
-    each x from 1..numDataSets
+    each x from minGroupSize..maxGroupSize
     file data from data.collect()
     file classpath2
     file jars_hash2
@@ -85,7 +85,7 @@ process runInference {
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
     --model.nGroups $nGroups \
-    --model.groupSize $groupSize \
+    --model.groupSize ${x} \
     --model.observations.file data.csv \
     --engine PT \
     --engine.nScans 2_000 \
