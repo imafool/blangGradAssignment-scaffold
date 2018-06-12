@@ -1,12 +1,8 @@
-/*
-vim: syntax=groovy
--*- mode: groovy;-*-
-*/
 #!/usr/bin/env nextflow
 
 deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
-nGroups = 20
+nGroups = 2
 groupSize = 3
 
 process build {
@@ -77,7 +73,7 @@ process runInference {
     file classpath2
     file jars_hash2
   output:
-    file "generated_${x}" into samples
+    file "samples" into samples
   """
   set -e
   tail -n +2 generated_${x}/observations.csv | awk -F "," '{print \$2, ",", \$3, ",", \$4}' | sed 's/ //g' > data.csv
@@ -97,14 +93,6 @@ process runInference {
   """   
 }
 
-process calculateESS {
-  cache 'deep'
-  input:
-    file sample from samples.collect()    
-  output:
-    file "
-
-}
 
 
 process summarizePipeline {
