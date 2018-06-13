@@ -37,19 +37,21 @@ public class ComputePermutationESS extends Experiment
   
   @Arg
   double infDuration;
+  
+  @Arg
+  int kthPerm;
 
   @Arg @DefaultValue("1")
   int moment        = 1;
   
   
-  public ArrayList<Double> testFunction(ArrayList<ArrayList<Double>> listOfPermutations) {
-    int TEST_INDEX = 0;
+  public ArrayList<Double> testFunction(ArrayList<ArrayList<Double>> listOfPermutations, int testIndex, int targetIndex) {
     double PASS_VALUE = 1;
     double FAIL_VALUE = 0;
     
     ArrayList<Double> testResult = new ArrayList<Double>();
     for (ArrayList<Double> permutation : listOfPermutations) {
-      if (permutation.get(TEST_INDEX) == TEST_INDEX) {
+      if (permutation.get(testIndex) == targetIndex) {
         testResult.add(PASS_VALUE);
       } else {
         testResult.add(FAIL_VALUE);
@@ -58,8 +60,7 @@ public class ComputePermutationESS extends Experiment
     return testResult;
   }
   
-  public static ArrayList<ArrayList<Double>> parsePermutationCSV(File permutationFile, int groupSize, int nGroups) throws FileNotFoundException, IOException {
-    int kthPermInGroup = 1;
+  public static ArrayList<ArrayList<Double>> parsePermutationCSV(File permutationFile, int groupSize, int nGroups, int kthPerm) throws FileNotFoundException, IOException {
     int span = groupSize * nGroups;
     
     CSVParser parser = CSVFormat.DEFAULT.parse(new FileReader(permutationFile));
@@ -69,7 +70,7 @@ public class ComputePermutationESS extends Experiment
     ArrayList<Double> permutation = new ArrayList<Double>();
     
     for (int i = 1; i <= records.size()-1; i += span){
-      if (i % span == kthPermInGroup) {
+      if (i % span == kthPerm) {
         permutation.clear();
         for (int j = 0; j < groupSize; j++) {
           permutation.add((double) Integer.parseInt(records.get(i+j).get(3)));
@@ -85,25 +86,32 @@ public class ComputePermutationESS extends Experiment
   {
     ArrayList<Double> testResults = null;
     try {
-      testResults = testFunction(parsePermutationCSV(csvFile, groupSize, nGroups));
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+      PrintWriter esspsWriter = new PrintWriter("essps_" + String.valueOf(groupSize)+".csv");
+      esspsWriter.print("\ngroupSize,kth_Perm,testIndex,targetIndex,essps");
+      for (int i = 0 ; i < groupSize ; i++) {
+        for (int j = i ; j < groupSize; j++) {
+          try {
+            testResults = testFunction(parsePermutationCSV(csvFile, groupSize, nGroups, kthPerm), i, j);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          double essps = EffectiveSampleSize.ess(testResults) / (infDuration / 1000);
+          esspsWriter.printf("\n%d,%d,%d,%d,%f", groupSize, kthPerm, i, j, essps);
+          esspsWriter.flush();
+        }
+      }
+      esspsWriter.close();
+    } catch (FileNotFoundException e1) {
+      e1.printStackTrace();
     }
+
 
     System.out.println(moment == 1 ?
        EffectiveSampleSize.ess(testResults) :
        EffectiveSampleSize.ess(testResults, x -> Math.pow(x, moment)));
 
 
-    try {
-      PrintWriter writer = new PrintWriter("essps"+"_"+String.valueOf(groupSize)+".txt", "UTF-8");
-      writer.write(String.valueOf(EffectiveSampleSize.ess(testResults)/(infDuration / 1000)));
-      writer.close();
-    } catch (FileNotFoundException | UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
+
     
   }
 

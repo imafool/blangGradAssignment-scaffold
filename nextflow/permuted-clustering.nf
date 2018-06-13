@@ -43,7 +43,7 @@ classpath.into {
 }
 
 minGroupSize=3
-maxGroupSize=5
+maxGroupSize=50
 
 process generateData {
   cache 'deep'
@@ -93,7 +93,7 @@ process runInference {
     --engine PT \
     --engine.nScans 2_000 \
     --engine.nThreads MAX \
-    --engine.nChains 8
+    --engine.nChains 1
   mv samples samples_${x}
   mv monitoring monitoring_${x}
   """   
@@ -107,6 +107,8 @@ process calculateESS {
     file monitoring from monitorings.collect()
     file classpath3
     file jars_hash3  
+  output:
+    file "essps_${x}.csv" into essps
   """
   INF_DURATION=\$(tail -n +2 monitoring_${x}/runningTimeSummary.tsv | cut -c16-99 | tr -d '[:space:]')
   set -e
@@ -114,9 +116,37 @@ process calculateESS {
     --nGroups $nGroups \
     --groupSize ${x} \
     --csvFile samples_${x}/permutations.csv \
-    --infDuration \$INF_DURATION 
+    --infDuration \$INF_DURATION \
+    --kthPerm 1
   """
 }
+
+process aggregateCsv {
+  cache 'deep'
+  input:
+    file essps from essps.collect()
+  output:
+    file "aggregated.csv" into aggregatedCSV
+  """
+  head -n 1 essps_${minGroupSize}.csv > aggregated.csv
+  for x in `seq $minGroupSize $maxGroupSize`;
+  do
+    tail -n +2 essps_\$x.csv >> aggregated.csv
+  done
+  """
+}
+
+process plot {
+  cache 'deep'
+  input:
+    file aggregatedCSV
+
+  """
+  echo "123"
+  """
+
+}
+
 
 
 process summarizePipeline {
