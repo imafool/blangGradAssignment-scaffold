@@ -87,7 +87,7 @@ public class ComputePermutationESS extends Experiment
     ArrayList<Double> testResults = null;
     try {
       PrintWriter esspsWriter = new PrintWriter("essps_" + String.valueOf(groupSize)+".csv");
-      esspsWriter.print("\ngroupSize,kth_Perm,testIndex,targetIndex,essps");
+      esspsWriter.print("groupSize,kth_Perm,testIndex,targetIndex,essps");
       for (int i = 0 ; i < groupSize ; i++) {
         for (int j = i ; j < groupSize; j++) {
           try {
@@ -100,6 +100,7 @@ public class ComputePermutationESS extends Experiment
           esspsWriter.flush();
         }
       }
+      esspsWriter.print("\n");
       esspsWriter.close();
     } catch (FileNotFoundException e1) {
       e1.printStackTrace();

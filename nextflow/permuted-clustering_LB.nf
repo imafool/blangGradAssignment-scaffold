@@ -87,7 +87,7 @@ process runInference {
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
     --samplers.useAnnotation true\
-    --samplers.excluded PermutationSamplerLB \
+    --samplers.excluded PermutationSampler \
     --model.nGroups $nGroups \
     --model.groupSize ${x} \
     --model.observations.file data.csv \
