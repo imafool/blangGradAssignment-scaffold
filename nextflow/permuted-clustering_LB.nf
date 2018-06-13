@@ -4,7 +4,7 @@ deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
 nGroups = 2
 minGroupSize=3
-maxGroupSize=25
+maxGroupSize=5
 
 process build {
   cache false
@@ -87,7 +87,7 @@ process runInference {
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
     --samplers.useAnnotation true\
-    --samplers.excluded PermutationSampler \
+    --samplers.excluded "PermutationSampler" \
     --model.nGroups $nGroups \
     --model.groupSize ${x} \
     --model.observations.file data.csv \
