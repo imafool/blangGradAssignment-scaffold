@@ -143,6 +143,7 @@ process aggregateCSV {
   """
 }
 
+
 process plot {
   cache 'deep'
   input:
