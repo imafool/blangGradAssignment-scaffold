@@ -6,6 +6,9 @@ nGroups = 2
 minGroupSize=3
 maxGroupSize=5
 
+samplerName="PermutationSamplerLB"
+excludedSampler="PermutationSampler"
+
 process build {
   cache false
   output:
@@ -60,6 +63,7 @@ process generateData {
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
+    --samplers.excluded matchings.${excludedSampler} \
     --model.nGroups $nGroups \
     --model.groupSize ${x} \
     --engine Forward
@@ -70,6 +74,7 @@ process generateData {
 process runInference {
   cache 'deep'
   input:
+    val excludedSampler
     each x from minGroupSize..maxGroupSize
     file data from data.collect()
     file classpath2
@@ -86,8 +91,7 @@ process runInference {
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
-    --samplers.useAnnotation true\
-    --samplers.excluded "PermutationSampler" \
+    --samplers.excluded matchings.${excludedSampler} \
     --model.nGroups $nGroups \
     --model.groupSize ${x} \
     --model.observations.file data.csv \
@@ -125,15 +129,16 @@ process calculateESS {
 process aggregateCSV {
   cache 'deep'
   input:
+    val samplerName
     file essps from essps.collect()
   output:
-    file "aggregated.csv" into aggregatedCSV
+    file "aggregated_${samplerName}.csv" into aggregatedCSV
   publishDir deliverableDir, mode: 'copy', overwrite: true
   """
-  head -n 1 essps_${minGroupSize}.csv > aggregated.csv
+  head -n 1 essps_${minGroupSize}.csv > aggregated_${samplerName}.csv
   for x in `seq $minGroupSize $maxGroupSize`;
   do
-    tail -n +2 essps_\$x.csv >> aggregated.csv
+    tail -n +2 essps_\$x.csv >> aggregated_${samplerName}.csv
   done
   """
 }
@@ -142,13 +147,13 @@ process plot {
   cache 'deep'
   input:
     file aggregatedCSV
+    val samplerName
   output:
     file 'essps_plot.pdf'
   publishDir deliverableDir, mode: 'copy', overwrite: true
   """
-  /usr/bin/Rscript ../../../plot.R "aggregated.csv"
+  /usr/bin/Rscript ../../../plot.R "aggregated_${samplerName}.csv"
   """
-
 }
 
 
