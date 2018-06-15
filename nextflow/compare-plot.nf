@@ -1,5 +1,3 @@
-#!/usr/bin/env nextflow
-
 deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
 // samplers based on permutations (perfect matchings)
@@ -13,7 +11,7 @@ process permutedClustering {
     val "done" into status
   """
   cd ../../..
-  nextflow run permuted-clustering.nf --sampler "$sampler" --maxGS 4
+  nextflow run permuted-clustering.nf --sampler "$sampler" --maxGS 30
   echo ${sampler} DONE
   """
 }
