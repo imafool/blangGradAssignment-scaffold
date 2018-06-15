@@ -1,3 +1,4 @@
+#!/usr/bin/env nextflow
 // params default values:
 params.SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"] 
 params.sampler = "PermutationSampler" 
