@@ -1,6 +1,6 @@
 // params default values:
-params.SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"] //default value if no arg is given
-params.sampler = "PermutationSampler" //default value if no arg is given
+params.SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"] 
+params.sampler = "PermutationSampler" 
 params.maxGS = 5
 
 //params chosen:

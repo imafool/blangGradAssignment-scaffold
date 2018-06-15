@@ -8,16 +8,20 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import com.google.common.collect.Lists;
+
 import bayonet.math.EffectiveSampleSize;
 import blang.inits.Arg;
 import blang.inits.DefaultValue;
 import blang.inits.experiments.Experiment;
+import briefj.BriefIO;
 
 
 
@@ -44,76 +48,37 @@ public class ComputePermutationESS extends Experiment
   @Arg @DefaultValue("1")
   int moment        = 1;
   
-  
-  public ArrayList<Double> testFunction(ArrayList<ArrayList<Double>> listOfPermutations, int testIndex, int targetIndex) {
-    double PASS_VALUE = 1;
-    double FAIL_VALUE = 0;
-    
-    ArrayList<Double> testResult = new ArrayList<Double>();
-    for (ArrayList<Double> permutation : listOfPermutations) {
-      if (permutation.get(testIndex) == targetIndex) {
-        testResult.add(PASS_VALUE);
-      } else {
-        testResult.add(FAIL_VALUE);
-      }
-    }
-    return testResult;
-  }
-  
-  public static ArrayList<ArrayList<Double>> parsePermutationCSV(File permutationFile, int groupSize, int nGroups, int kthPerm) throws FileNotFoundException, IOException {
-    int span = groupSize * nGroups;
-    
-    CSVParser parser = CSVFormat.DEFAULT.parse(new FileReader(permutationFile));
-    List<CSVRecord> records = parser.getRecords();
-    ArrayList<ArrayList<Double>> result = new ArrayList<ArrayList<Double>>();
 
-    ArrayList<Double> permutation = new ArrayList<Double>();
-    
-    for (int i = 1; i <= records.size()-1; i += span){
-      if (i % span == kthPerm) {
-        permutation.clear();
-        for (int j = 0; j < groupSize; j++) {
-          permutation.add((double) Integer.parseInt(records.get(i+j).get(3)));
-        }
-      result.add(new ArrayList<Double>(permutation));
-      }
-    }
-    return result;
-  }
-  
   @Override
   public void run() 
   {
-    ArrayList<Double> testResults = null;
+    PrintWriter esspsWriter = null;
     try {
-      PrintWriter esspsWriter = new PrintWriter("essps_" + String.valueOf(groupSize)+".csv");
-      esspsWriter.print("groupSize,kth_Perm,testIndex,targetIndex,essps");
-      for (int i = 0 ; i < groupSize ; i++) {
-        for (int j = i ; j < groupSize; j++) {
-          try {
-            testResults = testFunction(parsePermutationCSV(csvFile, groupSize, nGroups, kthPerm), i, j);
-          } catch (IOException e) {
-            e.printStackTrace();
+      esspsWriter = new PrintWriter("essps_" + String.valueOf(groupSize)+".csv");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    esspsWriter.print("groupSize,kth_Perm,testIndex,targetIndex,essps");
+  
+    List<Double> samples = new ArrayList<>();
+    List<Map<String,String>> data = Lists.newArrayList(BriefIO.readLines(csvFile).indexCSV().skip(0));
+    int m = data.size();
+    for (int i=0;i<nGroups;i++) {
+      for (int j=0;j<groupSize;j++) {
+        for (int k=0;k<groupSize;k++) {
+          int l=i*nGroups+j;
+          samples.clear();
+          while (l<m) {
+            samples.add(Integer.parseInt(data.get(l).get("value").trim())==k ? 1. : 0.);
+            l+=groupSize*nGroups;
           }
-          double essps = EffectiveSampleSize.ess(testResults) / (infDuration / 1000);
-          esspsWriter.printf("\n%d,%d,%d,%d,%f", groupSize, kthPerm, i, j, essps);
-          esspsWriter.flush();
+          esspsWriter.printf("\n%d,%d,%d,%d,%f", groupSize, i, j, k, EffectiveSampleSize.ess(samples)/(infDuration / 1000));
         }
       }
-      esspsWriter.print("\n");
-      esspsWriter.close();
-    } catch (FileNotFoundException e1) {
-      e1.printStackTrace();
+      esspsWriter.flush();
     }
-
-
-    System.out.println(moment == 1 ?
-       EffectiveSampleSize.ess(testResults) :
-       EffectiveSampleSize.ess(testResults, x -> Math.pow(x, moment)));
-
-
-
-    
+    esspsWriter.print("\n");
+    esspsWriter.close();
   }
 
   public static void main(String [] args) 

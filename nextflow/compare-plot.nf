@@ -8,18 +8,18 @@ SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"]
 process permutedClustering {
   echo true
   input:
-  val sampler from SAMPLERS
+    val sampler from SAMPLERS
   output:
     val "done" into status
   """
   cd ../../..
-  nextflow run permuted-clustering.nf --sampler "$sampler"
+  nextflow run permuted-clustering.nf --sampler "$sampler" --maxGS 4
   echo ${sampler} DONE
   """
 }
 
 
-process plotComp {
+process plotComparison {
   input:
     val v from status.toList()
   """
