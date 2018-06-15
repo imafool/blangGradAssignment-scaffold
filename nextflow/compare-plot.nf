@@ -2,15 +2,18 @@
 
 deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
+// samplers based on permutations (perfect matchings)
+SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"]
+
 process permutedClustering {
   echo true
   input:
-  val sampler from "permuted-clustering", "permuted-clustering-lb"
+  val sampler from SAMPLERS
   output:
     val "done" into status
   """
   cd ../../..
-  nextflow run ${sampler}.nf
+  nextflow run permuted-clustering.nf --sampler "$sampler"
   echo ${sampler} DONE
   """
 }
@@ -21,7 +24,7 @@ process plotComp {
     val v from status.toList()
   """
   cd ../../..
-  #!Rscript comparePlot.R "PermutationSampler" "PermutationSamplerLB"
+  Rscript comparePlot.R "PermutationSampler" "PermutationSamplerLB"
   """
 
 }

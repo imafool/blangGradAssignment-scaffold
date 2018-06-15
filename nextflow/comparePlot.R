@@ -1,9 +1,7 @@
 library(ggplot2)
 args = commandArgs(trailingOnly = TRUE)
-pwd = toString( getwd() )
-print (pwd)
-perm = paste(getwd(), "/deliverables/permuted-clustering/aggregated_", args[1], ".csv",sep="")
-perm_lb = paste(getwd(), "/deliverables/permuted-clustering-lb/aggregated_", args[2], ".csv",sep="")
+perm = paste(getwd(), "/deliverables/permuted-clustering/", args[1], "/aggregated_", args[1], ".csv",sep="")
+perm_lb = paste(getwd(), "/deliverables/permuted-clustering/", args[2], "/aggregated_", args[2], ".csv",sep="")
 
 data = read.csv(perm, header = TRUE)
 data_lb = read.csv(perm_lb, header = TRUE)
@@ -20,4 +18,8 @@ gg = ggplot(dat, aes(x=groupSize)) +
                  geom_boxplot(aes(y=log(essps), group=groupSize, colour="red")) +
                  geom_boxplot(aes(y=log(lbessps), group=groupSize, color="blue"))
 
-ggsave(paste(getwd(),"/deliverables/essps_comparison_plot.pdf",sep=""))
+ggsave(paste(getwd(), 
+            "/deliverables/permuted-clustering/essps_comparison_plot.pdf",
+            sep="")
+        )
+

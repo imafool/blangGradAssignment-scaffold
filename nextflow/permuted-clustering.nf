@@ -1,13 +1,17 @@
-#!/usr/bin/env nextflow
+// params default values:
+params.SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"] //default value if no arg is given
+params.sampler = "PermutationSampler" //default value if no arg is given
+params.maxGS = 5
 
-deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
+//params chosen:
+deliverableDir = 'deliverables/permuted-clustering/' + params.sampler
+samplerName = params.sampler
+maxGroupSize = params.maxGS
 
 nGroups = 2
-minGroupSize=3
-maxGroupSize=5
+minGroupSize = 3
+excludedSampler = (params.SAMPLERS - samplerName).collect({"matchings." + it}).join(" ") //can be more than one
 
-samplerName="PermutationSampler"
-excludedSampler="PermutationSamplerLB"
 
 process build {
   cache false
@@ -63,7 +67,7 @@ process generateData {
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
-    --samplers.excluded matchings.${excludedSampler} \
+    --samplers.excluded ${excludedSampler} \
     --model.nGroups $nGroups \
     --model.groupSize ${x} \
     --engine Forward
@@ -91,7 +95,7 @@ process runInference {
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
-    --samplers.excluded matchings.${excludedSampler} \
+    --samplers.excluded ${excludedSampler} \
     --model.nGroups $nGroups \
     --model.groupSize ${x} \
     --model.observations.file data.csv \
