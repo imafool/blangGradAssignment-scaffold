@@ -158,7 +158,7 @@ process plot {
     file 'essps_plot.pdf'
   publishDir deliverableDir, mode: 'copy', overwrite: true
   """
-  /usr/bin/Rscript ../../../plot.R "aggregated_${samplerName}.csv"
+  Rscript ../../../plot.R "aggregated_${samplerName}.csv"
   """
 }
 

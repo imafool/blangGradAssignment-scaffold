@@ -1,7 +1,10 @@
 library(ggplot2)
 args = commandArgs(trailingOnly = TRUE)
+pwd = toString( getwd() )
+print (pwd)
 perm = paste(getwd(), "/deliverables/permuted-clustering/aggregated_", args[1], ".csv",sep="")
 perm_lb = paste(getwd(), "/deliverables/permuted-clustering-lb/aggregated_", args[2], ".csv",sep="")
+
 data = read.csv(perm, header = TRUE)
 data_lb = read.csv(perm_lb, header = TRUE)
 

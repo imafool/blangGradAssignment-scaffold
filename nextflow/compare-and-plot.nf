@@ -3,34 +3,25 @@
 deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
 process permutedClustering {
-  output:
-    file "done1" into status1
-  '''
-  cd ../../..
-  nextflow run permuted-clustering.nf
-  touch done1
-  '''
-}
-
-process permutedClusteringLB {
-  output:
-    file "done2" into status2
-  '''
-  cd ../../..
-  nextflow run permuted-clustering-lb.nf
-  touch done2
-  '''
-}
-
-process plot {
+  echo true
   input:
-    file status1
-    file status2
+  val sampler from "permuted-clustering", "permuted-clustering-lb"
   output:
-    file "essps_comparison_plot.pdf"
-  publishDir deliverableDir, mode: 'copy', overwrite: true
+    val "done" into status
   """
-  #!/usr/bin/Rscript ../../../comparePlot.R "PermutationSampler" "PermutationSamplerLB"
+  cd ../../..
+  nextflow run ${sampler}.nf
+  echo ${sampler} DONE
+  """
+}
+
+
+process plotComp {
+  input:
+    val v from status.toList()
+  """
+  cd ../../..
+  #!Rscript comparePlot.R "PermutationSampler" "PermutationSamplerLB"
   """
 
 }
