@@ -5,6 +5,7 @@ import matchings.Permutation
 model PermutedClustering {
   param Integer nGroups
   param Integer groupSize
+  random RealVar lbFactor ?: latentReal()
   random List<RealVar> means ?: latentRealList(groupSize)
   random List<RealVar> variances ?: latentRealList(groupSize)
   random List<Permutation> permutations ?: {
@@ -17,7 +18,6 @@ model PermutedClustering {
    
   
   laws {
-    // Fill this. 
     variances.get(0) ~ Exponential(10.0)
     means.get(0) ~ ContinuousUniform(0.0, 1.0)
     

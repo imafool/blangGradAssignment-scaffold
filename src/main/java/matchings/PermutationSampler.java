@@ -23,6 +23,7 @@ public class PermutationSampler implements Sampler {
    * permutation being sampled. 
    */
   @SampledVariable Permutation permutation;
+  
   /**
    * This will contain all the elements of the prior or likelihood 
    * (collectively, factors), that depend on the permutation being 

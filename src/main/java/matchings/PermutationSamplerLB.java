@@ -31,6 +31,8 @@ public class PermutationSamplerLB implements Sampler {
    */
   @ConnectedFactor
   List<LogScaleFactor> numericFactors;
+  
+  
 
   @Override
   public void execute(Random rand) {
@@ -40,6 +42,7 @@ public class PermutationSamplerLB implements Sampler {
     double alpha = calculateAlpha(candidateIndex, proposedState);
     decide(proposedState, alpha, rand);
   }
+  
    
   /**
    * From list of neighbouring states, pick one categorically. 
@@ -54,6 +57,7 @@ public class PermutationSamplerLB implements Sampler {
 
     return proposal;
   }
+  
 
   /**
    * Return a list of neighbouring states 
@@ -90,7 +94,6 @@ public class PermutationSamplerLB implements Sampler {
   }
 
 
-
   /**
    * @return piY without affecting permutation.getConnections()
    */
@@ -100,7 +103,6 @@ public class PermutationSamplerLB implements Sampler {
     move(psb);
     return piY;
   }
-
 
 
   /**
@@ -113,8 +115,7 @@ public class PermutationSamplerLB implements Sampler {
     double qYX = getQYX(proposedState, candidateIndex);
    return Math.min(1.0, Math.exp(piY - piX + qYX - qXY));
   }
-
-
+  
 
   /**
    * Calculates qYX by first moving to the next state, then revert changes made.
@@ -154,9 +155,6 @@ public class PermutationSamplerLB implements Sampler {
       move(proposedState);
     } else {
       // do nothing
-    }
-       
+    }  
   }
-
-
 }

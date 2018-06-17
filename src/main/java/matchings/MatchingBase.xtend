@@ -19,6 +19,14 @@ import blang.inits.ConstructorArg
    * For vertex i in the first component, connections.get(i) 
    * give the index in the second bipartite component. 
    */
+   
+   /** 
+    * If the permutation is locally optimized, 
+    */
+  val public static double FREE = -1    
+  val public static double STANDARD_LBFACTOR = 0.5 //ideally, should be under blang class Sampler
+  public static double lbfactor
+   
   val List<Integer> connections
   
   /**

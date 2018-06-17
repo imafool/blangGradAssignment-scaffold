@@ -1,17 +1,17 @@
-// params default values:
+// params with default values:
 params.SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"] 
 params.sampler = "PermutationSampler" 
+params.minGS = 3
 params.maxGS = 5
+params.nGroups = 2
+params.lbFactor = 1.0
+excludedSamplers= (params.SAMPLERS - params.sampler).collect({"matchings." + it}).join(" ")
+deliverableDir = "deliverables/${workflow.scriptName.replace('.nf', '')}/$params.sampler"
 
-//params chosen:
-deliverableDir = 'deliverables/permuted-clustering/' + params.sampler
-samplerName = params.sampler
-maxGroupSize = params.maxGS
-
-nGroups = 2
-minGroupSize = 3
-excludedSampler = (params.SAMPLERS - samplerName).collect({"matchings." + it}).join(" ") //can be more than one
-
+/* add to commit -m: 
+removed unused arguments,
+params more concise and with better names for future edits and readibility
+*/
 
 process build {
   cache false
@@ -50,11 +50,10 @@ classpath.into {
   classpath3
 }
 
-
 process generateData {
   cache 'deep'
   input:
-    each x from minGroupSize..maxGroupSize
+    each x from params.minGS..params.maxGS
     file classpath1
     file jars_hash1
   output:
@@ -67,8 +66,9 @@ process generateData {
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
-    --samplers.excluded ${excludedSampler} \
-    --model.nGroups $nGroups \
+    --samplers.excluded $excludedSamplers \
+    --model.nGroups $params.nGroups \
+    --model.lbFactor $params.lbFactor \
     --model.groupSize ${x} \
     --engine Forward
   mv samples generated_${x}
@@ -77,9 +77,8 @@ process generateData {
 
 process runInference {
   cache 'deep'
-  input:
-    val excludedSampler
-    each x from minGroupSize..maxGroupSize
+  input:  
+    each x from params.minGS..params.maxGS
     file data from data.collect()
     file classpath2
     file jars_hash2
@@ -95,8 +94,9 @@ process runInference {
     --experimentConfigs.saveStandardStreams false \
     --experimentConfigs.recordExecutionInfo false \
     --experimentConfigs.recordGitInfo false \
-    --samplers.excluded ${excludedSampler} \
-    --model.nGroups $nGroups \
+    --samplers.excluded $excludedSamplers \
+    --model.nGroups $params.nGroups \
+    --model.lbFactor $params.lbFactor \
     --model.groupSize ${x} \
     --model.observations.file data.csv \
     --engine PT \
@@ -111,7 +111,7 @@ process runInference {
 process calculateESS {
   cache 'deep'
   input:
-    each x from minGroupSize..maxGroupSize
+    each x from params.minGS..params.maxGS
     file samples from samples.collect()
     file monitoring from monitorings.collect()
     file classpath3
@@ -122,7 +122,7 @@ process calculateESS {
   INF_DURATION=\$(tail -n +2 monitoring_${x}/runningTimeSummary.tsv | cut -c16-99 | tr -d '[:space:]')
   set -e
   java -cp `cat classpath` -Xmx8g matchings.ComputePermutationESS \
-    --nGroups $nGroups \
+    --nGroups $params.nGroups \
     --groupSize ${x} \
     --csvFile samples_${x}/permutations.csv \
     --infDuration \$INF_DURATION \
@@ -133,39 +133,33 @@ process calculateESS {
 process aggregateCSV {
   cache 'deep'
   input:
-    val samplerName
     file essps from essps.collect()
   output:
-    file "aggregated_${samplerName}.csv" into aggregatedCSV
+    file "aggregated_${params.sampler}.csv" into aggregatedCSV
   publishDir deliverableDir, mode: 'copy', overwrite: true
   """
-  head -n 1 essps_${minGroupSize}.csv > aggregated_${samplerName}.csv
-  for x in `seq $minGroupSize $maxGroupSize`;
+  head -n 1 essps_${params.minGS}.csv > aggregated_${params.sampler}.csv
+  for x in `seq $params.minGS $params.maxGS`;
   do
-    tail -n +2 essps_\$x.csv >> aggregated_${samplerName}.csv
+    tail -n +2 essps_\$x.csv >> aggregated_${params.sampler}.csv
   done
   """
 }
-
 
 process plot {
   cache 'deep'
   input:
     file aggregatedCSV
-    val samplerName
   output:
     file 'essps_plot.pdf'
   publishDir deliverableDir, mode: 'copy', overwrite: true
   """
-  Rscript ../../../plot.R "aggregated_${samplerName}.csv"
+  Rscript ../../../plot.R "aggregated_${params.sampler}.csv"
   """
 }
 
-
-
 process summarizePipeline {
   cache false
-  
   output:
       file 'pipeline-info.txt'
       
