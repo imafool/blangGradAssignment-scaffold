@@ -2,7 +2,7 @@ deliverableDir = 'deliverables/' + workflow.scriptName.replace('.nf','')
 
 nGroups = 2
 minGroupSize = 3
-maxGroupSize = 200
+maxGroupSize = 30
 
 process build {
   cache false
@@ -69,7 +69,7 @@ process runInference {
     file classpath2
     file jars_hash2
   output:
-    file "stpi.csv" into stpi
+    file "stpi_${i}.csv" into stpi
   """
   set -e 
   tail -n +2 generated${i}/observations.csv | awk -F "," '{print \$2, ",", \$3, ",", \$4}' | sed 's/ //g' > data.csv
@@ -86,7 +86,7 @@ process runInference {
     --engine.nScans 2_000 \
     --engine.nThreads MAX \
     --engine.nChains 1
-  echo $(awk -F '\t' '\$1 == "samplingTime_ms" {print \$NF}' monitoring/runningTimeSummary.tsv) ${i} > stpi_${i}.csv
+  echo ${i},\$(awk -F '\t' '\$1 == "samplingTime_ms" {print \$NF}' monitoring/runningTimeSummary.tsv) > stpi_${i}.csv
   """   
 }
 
@@ -98,10 +98,10 @@ process aggregateCSV {
     file 'stpi_aggregated.csv' into stpi_aggregated 
   publishDir deliverableDir, mode: 'copy', overwrite: true
   """
-  echo groupSize stpi > stpi_aggregated.csv
+  echo groupSize,stpi > stpi_aggregated.csv
   for x in `seq $minGroupSize $maxGroupSize`;
   do
-    tail -n +2 stpi_\$x.csv >> stpi_aggregated.csv
+    cat stpi_\$x.csv >> stpi_aggregated.csv
   done
   """
 }
