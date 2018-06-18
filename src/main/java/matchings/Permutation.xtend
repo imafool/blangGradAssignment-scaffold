@@ -19,15 +19,21 @@ import blang.inits.ConstructorArg
  * are automatically implemented, as well as other nice defaults 
  * (see the xtend documentation for details). 
  */
-@Samplers(PermutationSamplerLB, PermutationSampler)
+@Samplers(PermutationSampler, PermutationSamplerLB)
 @Data class Permutation extends MatchingBase {
   /**
    * Sample an independent uniform permutation in place.
    */
    
-  @DesignatedConstructor
+  
+    @DesignatedConstructor
   new (@ConstructorArg("component size") int componentSize) {
     super(componentSize)
+  } 
+  
+      @DesignatedConstructor
+  new (double d, @ConstructorArg("component size") int componentSize) {
+    super(d, componentSize)
   } 
   
   def void sampleUniform(Random random) { 

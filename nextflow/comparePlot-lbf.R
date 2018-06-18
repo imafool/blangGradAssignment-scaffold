@@ -1,20 +1,7 @@
 library(ggplot2)
-sampler = "PermutationSamplerLB"
 args = commandArgs(trailingOnly = TRUE)
-foo <- vector(mode="list", length(args))
-for (i in length(args)) {
-    foo[[[args[i]]) <- paste(
-        getwd(), 
-        "/deliverables/permuted-clustering/",
-        args[1], 
-        $sampler, 
-        "/aggregated_", 
-        $sampler, 
-        ".csv",sep="")
-}
-
-
-paste(getwd(), "/deliverables/permuted-clustering/", args[2], "/aggregated_", args[2], ".csv",sep="")
+perm = paste(getwd(), "/deliverables/permuted-clustering/", args[1], "/aggregated_", args[1], ".csv",sep="")
+perm_lb = paste(getwd(), "/deliverables/permuted-clustering/", args[2], "/aggregated_", args[2], ".csv",sep="")
 
 data = read.csv(perm, header = TRUE)
 data_lb = read.csv(perm_lb, header = TRUE)
@@ -35,4 +22,3 @@ ggsave(paste(getwd(),
             "/deliverables/permuted-clustering/essps_comparison_plot.pdf",
             sep="")
         )
-

@@ -133,7 +133,8 @@ public class PermutationSamplerLB implements Sampler {
    * namely qXY
    */
   private void calculateQ(PermutationStateProbability state) {
-    state.qXY = 0.5 * getPiNext(state);
+    double lbFactor = permutation.getLbFactor();
+    state.qXY = lbFactor * getPiNext(state);
     return;
   }
 

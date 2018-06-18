@@ -4,14 +4,18 @@ params.sampler = "PermutationSampler"
 params.minGS = 3
 params.maxGS = 5
 params.nGroups = 2
-params.lbFactor = 1.0
-excludedSamplers= (params.SAMPLERS - params.sampler).collect({"matchings." + it}).join(" ")
-deliverableDir = "deliverables/${workflow.scriptName.replace('.nf', '')}/$params.sampler"
+params.lbFactor = 0.5
 
-/* add to commit -m: 
-removed unused arguments,
-params more concise and with better names for future edits and readibility
-*/
+params.deliverableDir = "deliverables/" +
+                        "${workflow.scriptName.replace('.nf', '')}/" + 
+                        params.sampler + 
+                        "/" + 
+                        "GS${params.minGS}-${params.maxGS}LBF${params.lbFactor}"
+                      
+excludedSamplers = (params.SAMPLERS - params.sampler).collect({"matchings." + it}).join(" ")
+
+// nextflow run permuted-clustering.nf --sampler "PermutationSamplerLB" --minGS 6 --maxGS 7 --lbFactor 0.6
+
 
 process build {
   cache false
@@ -121,7 +125,7 @@ process calculateESS {
   """
   INF_DURATION=\$(tail -n +2 monitoring_${x}/runningTimeSummary.tsv | cut -c16-99 | tr -d '[:space:]')
   set -e
-  java -cp `cat classpath` -Xmx8g matchings.ComputePermutationESS \
+  java -cp `cat classpath` -Xmx8g matchings.ComputePermutationESS \\
     --nGroups $params.nGroups \
     --groupSize ${x} \
     --csvFile samples_${x}/permutations.csv \
@@ -135,13 +139,13 @@ process aggregateCSV {
   input:
     file essps from essps.collect()
   output:
-    file "aggregated_${params.sampler}.csv" into aggregatedCSV
-  publishDir deliverableDir, mode: 'copy', overwrite: true
+    file "aggregated.csv" into aggregatedCSV
+  publishDir params.deliverableDir, mode: 'copy', overwrite: true
   """
-  head -n 1 essps_${params.minGS}.csv > aggregated_${params.sampler}.csv
+  head -n 1 essps_${params.minGS}.csv > aggregated.csv
   for x in `seq $params.minGS $params.maxGS`;
   do
-    tail -n +2 essps_\$x.csv >> aggregated_${params.sampler}.csv
+    tail -n +2 essps_\$x.csv >> aggregated.csv
   done
   """
 }
@@ -151,19 +155,19 @@ process plot {
   input:
     file aggregatedCSV
   output:
-    file 'essps_plot.pdf'
-  publishDir deliverableDir, mode: 'copy', overwrite: true
+  file "essps_plot.pdf"
+  publishDir params.deliverableDir, mode: 'copy', overwrite: true
   """
-  Rscript ../../../plot.R "aggregated_${params.sampler}.csv"
+  Rscript ${workflow.launchDir}/plot.R "aggregated.csv"
   """
 }
 
 process summarizePipeline {
   cache false
   output:
-      file 'pipeline-info.txt'
+      file "pipeline-info.txt"
       
-  publishDir deliverableDir, mode: 'copy', overwrite: true
+  publishDir params.deliverableDir, mode: 'copy', overwrite: true
   
   """
   echo 'scriptName: $workflow.scriptName' >> pipeline-info.txt

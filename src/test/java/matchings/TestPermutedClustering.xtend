@@ -9,7 +9,8 @@ class TestPermutedClustering {
   
   val static PermutedClustering clusteringModel = new PermutedClustering.Builder()
     .setGroupSize(3)
-    .setNGroups(2) 
+    .setNGroups(2)
+    .setLbFactor (0.2)
     .build
   val static test = new ExactInvarianceTest => [
     nPosteriorSamplesPerIndep = 1_000
