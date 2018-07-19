@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -58,7 +60,7 @@ public class ComputePermutationESS extends Experiment
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
-    esspsWriter.print("groupSize,kth_Perm,testIndex,targetIndex,essps");
+    esspsWriter.print("groupSize,kth_Perm,testIndex,targetIndex,essps,mean");
   
     List<Double> samples = new ArrayList<>();
     List<Map<String,String>> data = Lists.newArrayList(BriefIO.readLines(csvFile).indexCSV().skip(0));
@@ -72,7 +74,12 @@ public class ComputePermutationESS extends Experiment
             samples.add(Integer.parseInt(data.get(l).get("value").trim())==k ? 1. : 0.);
             l+=groupSize*nGroups;
           }
-          esspsWriter.printf("\n%d,%d,%d,%d,%f", groupSize, i, j, k, EffectiveSampleSize.ess(samples)/(infDuration / 1000));
+          esspsWriter.printf("\n%d,%d,%d,%d,%f,%f", groupSize,
+                                                         i,
+                                                         j,
+                                                         k,
+                                                         EffectiveSampleSize.ess(samples),
+                                                         samples.stream().mapToDouble(Double::doubleValue).sum()/samples.size());
         }
       }
       esspsWriter.flush();

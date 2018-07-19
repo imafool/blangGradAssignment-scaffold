@@ -1,8 +1,8 @@
 // params with default values:
 params.SAMPLERS = ["PermutationSampler", "PermutationSamplerLB"] 
-params.sampler = "PermutationSampler" 
+params.sampler = "PermutationSamplerLB" 
 params.minGS = 3
-params.maxGS = 5
+params.maxGS = 70
 params.nGroups = 2
 params.lbFactor = 0.5
 
