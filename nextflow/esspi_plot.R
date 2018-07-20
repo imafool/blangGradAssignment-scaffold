@@ -2,14 +2,20 @@ require(dplyr)
 require(ggplot2)
 require(gridExtra)
 
+# IMPORTANT:
+# 1. Plot is offset by OFFSET to allow log-log plot. (exists negative values)
+# 2. Plotting from groupsize > exp(THRESH); looks like there are outliers
+
 CleanData <- function(data){
   # groupSize, essps (wrong name, should be just ess), mean
-  data <- data[,c(1,5,6)]
+  data <- data[,c(2,6,7)]
   data <- data[complete.cases(data),]
-  NUM_ITER <- 2000
+  NUM_ITER <- 1
   OFFSET <- 0.5
   MEAN <- 0.5
   HEAD <- 5
+  GROUP_THRESH <- 0
+  DIST_THRESH <- 0.2
   data$ess_per_iter <- data$essps/NUM_ITER
   data$log_groupSize <- log(data$groupSize)
   data$dist <- abs(data$mean - MEAN)
@@ -17,8 +23,11 @@ CleanData <- function(data){
     arrange_(~dist) %>%
     arrange_(~groupSize) %>%
     group_by_(~groupSize) %>%
-    do(head(.,n=HEAD)) %>%
+    # do(head(.,n=HEAD)) %>%
+    filter(dist < DIST_THRESH) %>%
     as.data.frame()
+  print(data)
+ 
   # log(mean ess per iter by groupSize)
   agg_data <- aggregate(data[,4], list(data$groupSize), mean)
   # NOTE: Transformed by shifting up by OFFSET
@@ -29,7 +38,7 @@ CleanData <- function(data){
   agg_data$x_plus <- log(agg_data$x + agg_data$sd)
   agg_data$x_minus <- log(agg_data$x - agg_data$sd)
   agg_data$x <- log(agg_data$x)
-  
+  agg_data <- subset(agg_data, Group.1 > GROUP_THRESH)
   return (agg_data)
 }
 
@@ -70,8 +79,8 @@ generate_plot <- function(data_naive, data_lb){
     xlab("log(Group Size)") +
     ylab("log(ESS/Iter)") +
     # Confidence band
-    geom_ribbon(data=data_naive, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.05, fill='blue') +
-    geom_ribbon(data=data_lb, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.35, fill='pink') +
+    # geom_ribbon(data=data_naive, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.05, fill='blue') +
+    # geom_ribbon(data=data_lb, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.35, fill='pink') +
     # Trace
     geom_line(data=data_naive, aes(x=Group.1, y=x, colour='Naive')) +
     geom_line(data=data_lb, aes(x=Group.1, y=x, colour='LB')) +
@@ -87,7 +96,6 @@ generate_plot <- function(data_naive, data_lb){
   ggsave('ESSperIterVSGroupSize.pdf')
   plot
 }
-
 
 data_naive <- CleanData(LoadData(""))
 data_lb <- CleanData(LoadData("LB"))
