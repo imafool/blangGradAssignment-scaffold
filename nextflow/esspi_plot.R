@@ -4,7 +4,6 @@ require(gridExtra)
 
 # IMPORTANT:
 # 1. Plot is offset by OFFSET to allow log-log plot. (exists negative values)
-# 2. Plotting from groupsize > exp(THRESH); looks like there are outliers
 
 CleanData <- function(data, head=5, group_thresh=0, dist_thresh=0.2, is_lb=FALSE){
   # groupSize, essps (wrong name, should be just ess), mean
@@ -22,7 +21,7 @@ CleanData <- function(data, head=5, group_thresh=0, dist_thresh=0.2, is_lb=FALSE
     arrange_(~groupSize) %>%
     group_by_(~groupSize) %>%
     filter(dist < dist_thresh) %>%
-    # do(head(.,n=head)) %>%
+    do(head(.,n=head)) %>%
     as.data.frame()
   # log(mean ess per iter by groupSize)
   agg_data <- aggregate(data[,4], list(data$groupSize), mean)
@@ -37,8 +36,8 @@ CleanData <- function(data, head=5, group_thresh=0, dist_thresh=0.2, is_lb=FALSE
   agg_data$Group.1 <- log(agg_data$Group.1)
   agg_data$COUNT <- aggregate(data[,4], list(data$groupSize), length)$x
   agg_data$sd <- aggregate(data[,4], list(data$groupSize), sd)$x
-  agg_data$x_plus <- log(agg_data$x + agg_data$sd)
-  agg_data$x_minus <- log(agg_data$x - agg_data$sd)
+  agg_data$x_plus <- log(agg_data$x + 2*agg_data$sd)
+  agg_data$x_minus <- log(agg_data$x - 2*agg_data$sd)
   agg_data$x <- log(agg_data$x)
   agg_data <- subset(agg_data, Group.1 > group_thresh)
   return (agg_data)
@@ -54,23 +53,31 @@ LoadData <- function(name=""){
   return (data)
 }
 
-generate_plots <- function(data_naive, data_lb) {
-  naive <- ggplot(data_naive, aes(x=Group.1, y=x)) +
-    geom_line(outlier.shape = NA) +
-    ylab("Log ESS/iter") +
-    xlab("Log-Group-Size") +
-    ylim(c(-5,1))+
-    ggtitle("NAIVE")
-  
-  lb <- ggplot(data_lb, aes(x=Group.1, y=x)) +
-    geom_line(outlier.shape = NA) +
-    ylab("Log ESS/iter") +
-    xlab("Log-Group-Size") +
-    ylim(c(-5,1)) +
-    ggtitle("LB")
-  grid.arrange(naive, lb)
+generate_plot_points <- function(data_naive, data_lb){
   setwd("/home/kevinchern/sandbox")
-  ggsave("loglog_ESS_PER_ITER.pdf", arrangeGrob(naive, lb))
+  plot <- ggplot() +
+    xlab("log(Group Size)") +
+    ylab("log(ESS/Iter)") +
+    # Confidence band
+    geom_ribbon(data=data_naive, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.05, fill='blue') +
+    geom_ribbon(data=data_lb, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.35, fill='pink') +
+    # points
+    geom_point(data=data_naive, aes(x=Group.1, y=x, colour='Naive')) +
+    geom_point(data=data_lb, aes(x=Group.1, y=x, colour='LB'))+
+    # Regression Line
+    geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x), se=TRUE)+
+    geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x), color='red', se=TRUE)+
+    # print(lm(x~Group.1, data_naive))
+    # print(lm(x~Group.1, data_lb))
+    # Regressio Line CB
+    # geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x_plus), linetype='dotted', se=FALSE)+
+    # geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x_minus), linetype='dotted', se=FALSE)+
+    # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_plus), color='red', linetype='dotted', se=FALSE)+
+    # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_minus),color='red', linetype='dotted', se=FALSE)
+    labs(color="Proposals")
+    
+  ggsave('ESSperIterVSGroupSize.pdf')
+  plot
 }
 
 generate_plot <- function(data_naive, data_lb){
@@ -85,8 +92,9 @@ generate_plot <- function(data_naive, data_lb){
     geom_line(data=data_naive, aes(x=Group.1, y=x, colour='Naive')) +
     geom_line(data=data_lb, aes(x=Group.1, y=x, colour='LB')) +
     # Regression Line
-    # geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x), se=FALSE) +
-    # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x), color='red', se=FALSE) +
+    geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x), se=FALSE) +
+    geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x), color='red', se=FALSE) +
+    
     # Regressio Line CB
     # geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x_plus), linetype='dotted', se=FALSE)+
     # geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x_minus), linetype='dotted', se=FALSE)+
@@ -101,7 +109,7 @@ exe_per_ess_plot <- function(data_naive, data_lb){
   setwd("/home/kevinchern/sandbox")
   plot <- ggplot() +
     xlab("log(Group Size)") +
-    ylab("log(Exec/ESS)") +
+    ylab("log(Cost/ESS)") +
     # Confidence band
     # geom_ribbon(data=data_naive, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.05, fill='blue') +
     # geom_ribbon(data=data_lb, aes(x=Group.1, ymax=x_plus, ymin=x_minus), alpha=0.35, fill='pink') +
@@ -116,16 +124,18 @@ exe_per_ess_plot <- function(data_naive, data_lb){
     # geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x_minus), linetype='dotted', se=FALSE)+
     # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_plus), color='red', linetype='dotted', se=FALSE)+
     # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_minus),color='red', linetype='dotted', se=FALSE)
+    labs(color="Proposals")
   
-  ggsave('exec-per-ess.pdf')
+  ggsave('cost-per-ess.pdf')
   plot
 }
 
-h=1000
-gt=0
-dt=0.2
-data_naive <- CleanData(LoadData(""), head=h, group_thresh=gt, dist_thresh=dt, is_lb=FALSE)
-data_lb <- CleanData(LoadData("LB"), head=h, group_thres=gt, dist_thresh=dt, is_lb=TRUE)
-# exe_per_ess_plot(data_naive, data_lb)
-generate_plot(data_naive, data_lb)
+main <- function(h, gt, dt){
+  data_naive <- CleanData(LoadData(""), head=h, group_thresh=gt, dist_thresh=dt, is_lb=FALSE)
+  data_lb <- CleanData(LoadData("LB"), head=h, group_thres=gt, dist_thresh=dt, is_lb=TRUE)
+  exe_per_ess_plot(data_naive, data_lb)
+  # generate_plot_points(data_naive, data_lb)
+}
+ 
+main(h=1000, gt=0, dt=1) 
 
