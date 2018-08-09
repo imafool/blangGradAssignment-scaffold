@@ -44,12 +44,17 @@ CleanData <- function(data, head=5, group_thresh=0, dist_thresh=0.2, is_lb=FALSE
 }
 
 # @param name: default "" or "LB"
-LoadData <- function(path_name){
+LoadData <- function(name=""){
+  path_name <- paste("/home/kevinchern/blang/blangGradAssignment-scaffold/nextflow/deliverables/permuted-clustering/PermutationSampler",
+                     name,
+                     "/GS3-60LBF0.5/aggregated.csv",
+                     sep="")
   data <- read.csv(path_name)
   return (data)
 }
 
-generate_plot_points <- function(data_naive, data_lb, lin_mod=TRUE){
+generate_plot_points <- function(data_naive, data_lb){
+  setwd("/home/kevinchern/sandbox")
   plot <- ggplot() +
     xlab("log(Group Size)") +
     ylab("log(ESS/Iter)") +
@@ -59,6 +64,9 @@ generate_plot_points <- function(data_naive, data_lb, lin_mod=TRUE){
     # points
     geom_point(data=data_naive, aes(x=Group.1, y=x, colour='Naive')) +
     geom_point(data=data_lb, aes(x=Group.1, y=x, colour='LB'))+
+    # Regression Line
+    geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x), se=TRUE)+
+    geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x), color='red', se=TRUE)+
     # print(lm(x~Group.1, data_naive))
     # print(lm(x~Group.1, data_lb))
     # Regressio Line CB
@@ -67,13 +75,9 @@ generate_plot_points <- function(data_naive, data_lb, lin_mod=TRUE){
     # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_plus), color='red', linetype='dotted', se=FALSE)+
     # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_minus),color='red', linetype='dotted', se=FALSE)
     labs(color="Proposals")
-  if (lin_mod==TRUE){
-    # Regression Line
-    plot <- plot + geom_smooth(data=data_naive, method='lm', aes(x=Group.1, y=x), se=TRUE) + 
-      geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x), color='red', se=TRUE)
-  }
     
-  return (plot)
+  ggsave('ESSperIterVSGroupSize.pdf')
+  plot
 }
 
 generate_plot <- function(data_naive, data_lb){
@@ -102,6 +106,7 @@ generate_plot <- function(data_naive, data_lb){
 }
 
 exe_per_ess_plot <- function(data_naive, data_lb){
+  setwd("/home/kevinchern/sandbox")
   plot <- ggplot() +
     xlab("log(Group Size)") +
     ylab("log(Cost/ESS)") +
@@ -121,44 +126,16 @@ exe_per_ess_plot <- function(data_naive, data_lb){
     # geom_smooth(data=data_lb, method='lm', aes(x=Group.1, y=x_minus),color='red', linetype='dotted', se=FALSE)
     labs(color="Proposals")
   
-  return (plot)
+  ggsave('cost-per-ess.pdf')
+  plot
 }
 
-main <- function(h, gt, dt, dir, lb_path, naive_path){
-  GROUP_THRESH <- 0
-  DIST_THRESH <- 1
-  setwd(dir)
-  raw_naive <- LoadData(naive)
-  raw_lb <- LoadData(lb)
-  
-  # cleaned according to input
-  # 50-100 no thresh
-  data_naive <- CleanData(raw_naive, head=h, group_thresh=gt, dist_thresh=DIST_THRESH, is_lb=FALSE)
-  data_lb <- CleanData(raw_lb, head=h, group_thres=gt, dist_thresh=DIST_THRESH, is_lb=TRUE)
-  p1 <- generate_plot_points(data_naive, data_lb)
-  
-  # 50-100 with thresh
-  data_naive <- CleanData(raw_naive, head=h, group_thresh=gt, dist_thresh=dt, is_lb=FALSE)
-  data_lb <- CleanData(raw_lb, head=h, group_thres=gt, dist_thresh=dt, is_lb=TRUE)
-  p2 <- generate_plot_points(data_naive, data_lb)
-  
-  # 3-100 no thresh
-  data_naive <- CleanData(raw_naive, head=h, group_thresh=GROUP_THRESH, dist_thresh=DIST_THRESH, is_lb=FALSE)
-  data_lb <- CleanData(raw_lb, head=h, group_thres=GROUP_THRESH, dist_thresh=DIST_THRESH, is_lb=TRUE)
-  p3 <- generate_plot_points(data_naive, data_lb, lin_mod=FALSE)
-  
-  # 3-100 with thresh
-  data_naive <- CleanData(raw_naive, head=h, group_thresh=GROUP_THRESH, dist_thresh=dt, is_lb=FALSE)
-  data_lb <- CleanData(raw_lb, head=h, group_thres=GROUP_THRESH, dist_thresh=dt, is_lb=TRUE)
-  p4 <- generate_plot_points(data_naive, data_lb, lin_mod=FALSE)
-  
-  pdf("combined.pdf")
-  grid.arrange(p1,p2,p3,p4,nrow=2)
-  dev.off()
+main <- function(h, gt, dt){
+  data_naive <- CleanData(LoadData(""), head=h, group_thresh=gt, dist_thresh=dt, is_lb=FALSE)
+  data_lb <- CleanData(LoadData("LB"), head=h, group_thres=gt, dist_thresh=dt, is_lb=TRUE)
+  exe_per_ess_plot(data_naive, data_lb)
+  # generate_plot_points(data_naive, data_lb)
 }
-
-lb <- "/home/kevinchern/blang/blangGradAssignment-scaffold/nextflow/deliverables/permuted-clustering/PermutationSamplerLB/GS3-60LBF0.5/aggregated.csv"
-naive <- "/home/kevinchern/blang/blangGradAssignment-scaffold/nextflow/deliverables/permuted-clustering/PermutationSampler/GS3-60LBF0.5/aggregated.csv"
-output_dir <-"/home/kevinchern/sandbox" 
-main(h=1000, gt=3.912, dt=0.2, output_dir, lb, naive)
+ 
+main(h=1000, gt=0, dt=1) 
 
